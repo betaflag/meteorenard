@@ -1,27 +1,26 @@
 import type { IWeatherService } from './IWeatherService';
 import type { WeatherData } from '@/types/weather';
+import type { Location } from '@/types/location';
 import type { OpenMeteoResponse } from './adapters/openMeteoTypes';
 import { adaptOpenMeteoResponse } from './adapters/openMeteoAdapter';
 import { weatherConfig } from '@/config/weather.config';
 
 export class OpenMeteoService implements IWeatherService {
   private readonly baseUrl: string;
-  private readonly location: typeof weatherConfig.location;
 
   constructor() {
     this.baseUrl = weatherConfig.apis.openMeteo.baseUrl;
-    this.location = weatherConfig.location;
   }
 
-  async fetchWeather(): Promise<WeatherData> {
+  async fetchWeather(location: Location): Promise<WeatherData> {
     try {
       const params = new URLSearchParams({
-        latitude: this.location.latitude.toString(),
-        longitude: this.location.longitude.toString(),
+        latitude: location.latitude.toString(),
+        longitude: location.longitude.toString(),
         current_weather: 'true',
-        hourly: 'temperature_2m,weathercode,apparent_temperature,relativehumidity_2m,windspeed_10m,precipitation_probability',
+        hourly: 'temperature_2m,weathercode,apparent_temperature,relativehumidity_2m,windspeed_10m,precipitation_probability,precipitation',
         daily: 'temperature_2m_max,temperature_2m_min,weathercode,precipitation_probability_max',
-        timezone: 'America/Montreal',
+        timezone: 'auto',
         forecast_days: '10',
       });
 
@@ -37,7 +36,7 @@ export class OpenMeteoService implements IWeatherService {
 
       const data: OpenMeteoResponse = await response.json();
 
-      return adaptOpenMeteoResponse(data, this.location.name);
+      return adaptOpenMeteoResponse(data, location.name);
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(`Failed to fetch weather from Open-Meteo: ${error.message}`);

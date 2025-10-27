@@ -7,6 +7,7 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
+  Legend,
   ResponsiveContainer,
 } from 'recharts';
 import type { HourlyWeather } from '@/types/weather';
@@ -57,6 +58,14 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
             <div className="flex items-center gap-2">
               <Hand className="w-4 h-4 text-[#ffb347]" />
               <span className="text-[#e5e7eb]">Ressenti: {data.feelsLike}°C</span>
+            </div>
+          )}
+          {data.precipitation !== undefined && data.precipitation > 0 && (
+            <div className="flex items-center gap-2">
+              <Droplets className="w-4 h-4 text-[#4fc3f7]" />
+              <span className="text-[#4fc3f7]">
+                Précipitations: {data.precipitation.toFixed(1)} mm
+              </span>
             </div>
           )}
           {data.precipitationProbability !== undefined && (
@@ -135,7 +144,7 @@ export function HourlyChart({ data }: HourlyChartProps) {
       </div>
 
       {/* Chart */}
-      <div className="w-full h-[420px] sm:h-[480px] md:h-[520px]">
+      <div className="w-full h-[250px] sm:h-[280px] md:h-[320px]">
         <ResponsiveContainer width="100%" height="100%">
         <ComposedChart
           data={chartData}
@@ -143,7 +152,7 @@ export function HourlyChart({ data }: HourlyChartProps) {
             top: 5,
             right: hasPrecipitation ? (isMobile ? 5 : 10) : (isMobile ? 5 : 10),
             left: isMobile ? -15 : 5,
-            bottom: isMobile ? 35 : 5
+            bottom: isMobile ? 40 : 10
           }}
         >
           <CartesianGrid
@@ -205,6 +214,22 @@ export function HourlyChart({ data }: HourlyChartProps) {
           <Tooltip
             content={<CustomTooltip />}
             cursor={{ stroke: 'rgba(255, 107, 0, 0.3)', strokeWidth: 2 }}
+          />
+          <Legend
+            verticalAlign="bottom"
+            height={isMobile ? 30 : 36}
+            wrapperStyle={{
+              paddingTop: isMobile ? '10px' : '15px',
+              fontFamily: 'Raleway, sans-serif',
+              fontSize: isMobile ? '10px' : '12px',
+            }}
+            iconType="line"
+            iconSize={isMobile ? 10 : 12}
+            formatter={(value) => (
+              <span style={{ color: '#e5e7eb', fontSize: isMobile ? '10px' : '12px' }}>
+                {value}
+              </span>
+            )}
           />
           <Line
             type="monotone"

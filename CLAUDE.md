@@ -20,6 +20,9 @@ npm run lint
 
 # Preview production build
 npm run preview
+
+# Generate images with Gemini AI (requires GEMINI_API_KEY in .env)
+npm run gemini -- "prompt text" output_filename
 ```
 
 ## Architecture
@@ -57,14 +60,50 @@ Weather service configuration is centralized in `src/config/weather.config.ts`:
 - API endpoints for each provider
 - Refresh interval (10 minutes by default)
 
+### Service Layer
+
+Beyond weather data providers, the app includes specialized services for recommendations:
+
+**ClothingRecommendationService** (`src/services/clothing/ClothingRecommendationService.ts`):
+- Provides temperature-based clothing recommendations
+- Uses predefined temperature ranges (cold, cool, mild, warm, hot)
+- Returns categorized clothing items (upper, lower, outerwear, accessories, footwear)
+- Clothing data defined in `src/services/clothing/clothingData.ts`
+
+**TimeBlockService** (`src/services/timeBlock/TimeBlockService.ts`):
+- Divides the day into time blocks: Morning (8h-12h), Afternoon (12h-17h), Evening (18h-22h)
+- Combines weather forecast data with clothing recommendations for each block
+- Determines current time block and provides next 3 blocks of recommendations
+- Integrates with `ClothingRecommendationService` to provide context-aware suggestions
+
 ### Component Structure
 
-- `App.tsx` - Main container managing state, provider switching, and data fetching
-- `components/weather/WeatherWidget.tsx` - Main weather display container with loading/error states
-- `components/weather/CurrentWeather.tsx` - Displays current weather conditions
-- `components/weather/HourlyForecast.tsx` - Shows next 8 hours of forecast
+**Main App Container**:
+- `App.tsx` - Root component managing global state, provider switching, data fetching, and periodic refresh
+
+**Layout Components**:
+- `components/layout/Header.tsx` - App header with branding and provider toggle
+- `components/layout/AppMenu.tsx` - Navigation/settings menu
+
+**Weather Widget Components**:
+- `components/weather/WeatherWidget.tsx` - Current weather conditions with loading/error states
+- `components/weather/HourlyChartWidget.tsx` - Temperature chart for next 24 hours (uses Recharts)
+- `components/weather/DailyForecastWidget.tsx` - 10-day forecast overview
+- `components/weather/ClothingForecastWidget.tsx` - Time block-based clothing recommendations
+
+**Weather Display Components**:
+- `components/weather/CurrentWeather.tsx` - Current conditions display
+- `components/weather/HourlyForecast.tsx` - Scrollable hourly forecast (next 8 hours)
+- `components/weather/HourlyChart.tsx` - Chart component for temperature visualization
+- `components/weather/DailyForecast.tsx` - Daily forecast list
+- `components/weather/HourlyItem.tsx` - Individual hourly forecast item
+- `components/weather/DailyItem.tsx` - Individual daily forecast item
+- `components/weather/TimeBlockCard.tsx` - Time block with weather and clothing recommendations
+- `components/weather/WeatherIcon.tsx` - Weather condition icon mapping
 - `components/weather/ProviderToggle.tsx` - UI for switching between weather providers
-- `components/ui/` - Reusable UI components (card, badge, select) using Radix UI primitives
+
+**UI Primitives** (`components/ui/`):
+- Reusable components using Radix UI: card, badge, select, button, sheet (dialog/drawer)
 
 ### Path Aliases
 
@@ -93,7 +132,9 @@ The project uses TypeScript project references with separate configs:
 ## Key Dependencies
 
 - **React 19** with hooks-based state management
-- **Radix UI** for accessible UI primitives
+- **Radix UI** for accessible UI primitives (@radix-ui/react-dialog, @radix-ui/react-select, @radix-ui/react-slot)
 - **Lucide React** for icons
+- **Recharts** for temperature charts and data visualization
 - **Vite** for build tooling with React plugin
-- **Tailwind CSS v4** for styling
+- **Tailwind CSS v4** for styling via `@tailwindcss/vite` plugin
+- **tsx** for running TypeScript scripts (used by Gemini CLI tool)

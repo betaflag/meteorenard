@@ -98,15 +98,15 @@ function translateCondition(condition: string): string {
 }
 
 /**
- * Format time from ISO string to HH:MM format
+ * Format time from ISO string to 12-hour format (e.g., 10PM, 1AM)
  */
 function formatTime(isoString: string): string {
   const date = new Date(isoString);
-  return date.toLocaleTimeString('fr-CA', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  });
+  let hours = date.getHours();
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+  return `${hours}${ampm}`;
 }
 
 /**
@@ -147,13 +147,17 @@ export function adaptMSCGeoMetResponse(
   // Current weather - condition is an object with en/fr properties
   const currentCondition = mapConditionToWeatherCondition(current.condition.en);
 
-  // Hourly forecast (take first 8 hours)
+  // Hourly forecast (take up to 24 hours)
   const hourly = props.hourlyForecastGroup.hourlyForecasts
-    .slice(0, 8)
+    .slice(0, 24)
     .map((hour) => ({
       time: formatTime(hour.timestamp),
       temp: Math.round(hour.temperature.value.en),
       condition: mapConditionToWeatherCondition(hour.condition.en),
+      feelsLike: undefined, // Not available in EC API
+      humidity: undefined, // Not available in EC hourly forecast
+      windSpeed: undefined, // Not available in EC hourly forecast
+      precipitationProbability: hour.lop?.value.en, // Likelihood of precipitation
     }));
 
   // Daily forecast - group by day (skip night periods for daily view)
