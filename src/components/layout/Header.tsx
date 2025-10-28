@@ -27,7 +27,7 @@ export function Header({
 }: HeaderProps) {
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-50 w-full border-b border-[#ff6b00]/20"
+      className="fixed top-0 left-0 right-0 z-50 w-full"
       style={{
         background:
           'linear-gradient(135deg, rgba(26, 26, 46, 0.85) 0%, rgba(36, 36, 56, 0.85) 100%)',

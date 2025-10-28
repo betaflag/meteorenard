@@ -1,4 +1,3 @@
-import { Card, CardContent } from '@/components/ui/card';
 import { CurrentWeather } from './CurrentWeather';
 import { HourlyForecast } from './HourlyForecast';
 import { CloudOff, RefreshCw } from 'lucide-react';
@@ -10,19 +9,19 @@ import backgroundImage3 from '@/assets/renard_steampunk_fall_workshop.jpg';
 import backgroundImage4 from '@/assets/renard_steampunk_fall_park.jpg';
 import backgroundImage5 from '@/assets/renard_steampunk_fall_rooftop.jpg';
 
-interface WeatherWidgetProps {
+interface WeatherHeroProps {
   data: WeatherData | null;
   isLoading?: boolean;
   error?: string | null;
   onRetry?: () => void;
 }
 
-export function WeatherWidget({
+export function WeatherHero({
   data,
   isLoading = false,
   error = null,
   onRetry,
-}: WeatherWidgetProps) {
+}: WeatherHeroProps) {
   // Randomly select a background image (memoized so it doesn't change on re-renders)
   const backgroundImage = useMemo(() => {
     const images = [backgroundImage1, backgroundImage2, backgroundImage3, backgroundImage4, backgroundImage5];
@@ -91,16 +90,15 @@ export function WeatherWidget({
   };
 
   return (
-    <Card
-      className="relative w-full max-w-[1400px] mx-auto border-[#ff6b00]/35 overflow-hidden rounded-2xl sm:rounded-3xl"
+    <section
+      className="relative w-full overflow-hidden pt-[76px] sm:pt-[84px]"
       style={{
         background:
           'linear-gradient(135deg, rgba(26, 26, 46, 0.7) 0%, rgba(36, 36, 56, 0.6) 50%, rgba(46, 46, 66, 0.5) 100%)',
         backdropFilter: 'blur(20px)',
         boxShadow: `
           0 20px 50px rgba(0, 0, 0, 0.5),
-          0 0 40px rgba(255, 107, 0, 0.15),
-          inset 0 0 0 1px rgba(255, 255, 255, 0.1)
+          0 0 40px rgba(255, 107, 0, 0.15)
         `,
       }}
     >
@@ -134,9 +132,9 @@ export function WeatherWidget({
         }}
       />
 
-      <CardContent className="relative z-10 p-4 sm:p-6 md:p-8 lg:p-10">
+      <div className="relative z-10 p-4 sm:p-6 md:p-8 lg:p-10">
         {renderContent()}
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   );
 }

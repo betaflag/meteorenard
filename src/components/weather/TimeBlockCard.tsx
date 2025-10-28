@@ -44,7 +44,6 @@ export function TimeBlockCard({ data, isHighlighted = false }: TimeBlockCardProp
         boxShadow: isHighlighted
           ? `
             0 10px 40px rgba(0, 0, 0, 0.5),
-            0 0 50px rgba(255, 107, 0, 0.4),
             inset 0 0 0 2px rgba(255, 107, 0, 0.25)
           `
           : `

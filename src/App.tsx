@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Header } from './components/layout/Header';
-import { WeatherWidget } from './components/weather/WeatherWidget';
+import { WeatherHero } from './components/weather/WeatherHero';
 import { HourlyChartWidget } from './components/weather/HourlyChartWidget';
 import { DailyForecastWidget } from './components/weather/DailyForecastWidget';
 import { ClothingForecastWidget } from './components/weather/ClothingForecastWidget';
@@ -166,12 +166,10 @@ function App() {
       )}
 
       {/* Main Content */}
-      <div className={`min-h-screen p-0 md:px-8 md:pb-8 ${currentLocation ? 'pt-[76px] sm:pt-[84px]' : 'pt-8'}`}>
-        {/* Widgets Container */}
-        <div className="flex flex-col gap-6 items-start justify-center px-1 md:px-0">
-        {/* Current Weather Widget */}
+      <div className="min-h-screen">
+        {/* Hero Section - Full Width, Starts Below Header */}
         {currentLocation ? (
-          <WeatherWidget
+          <WeatherHero
             data={weatherData}
             isLoading={isLoading}
             error={error}
@@ -182,16 +180,16 @@ function App() {
             }}
           />
         ) : (
-          <div className="w-full max-w-2xl mx-auto p-8 text-center">
+          <div className="w-full p-8 text-center mt-[76px] sm:mt-[84px]">
             <p className="text-[#e5e7eb] text-lg">
               Veuillez sélectionner une localisation pour afficher la météo
             </p>
           </div>
         )}
 
-        {/* Only show other widgets if we have a location and weather data */}
+        {/* Widgets Container - Constrained Width */}
         {currentLocation && (
-          <>
+          <div className="max-w-[1400px] mx-auto flex flex-col gap-6 items-start justify-center px-4 md:px-8 py-6">
             {/* Clothing Forecast Widget */}
             <ClothingForecastWidget data={weatherData} />
 
@@ -200,9 +198,8 @@ function App() {
 
             {/* 10-Day Forecast Widget */}
             <DailyForecastWidget data={weatherData} />
-          </>
+          </div>
         )}
-        </div>
       </div>
 
       {/* Location Permission Dialog (First Visit) */}
