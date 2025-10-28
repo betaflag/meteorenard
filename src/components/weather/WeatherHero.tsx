@@ -1,8 +1,13 @@
 import { CurrentWeather } from './CurrentWeather';
 import { HourlyForecast } from './HourlyForecast';
-import { CloudOff, RefreshCw } from 'lucide-react';
+import { CloudOff, RefreshCw, Menu } from 'lucide-react';
 import type { WeatherData } from '@/types/weather';
+import type { WeatherProvider } from '@/config/weather.config';
+import type { Location } from '@/types/location';
 import { useMemo, useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { AppMenu } from '@/components/layout/AppMenu';
 import backgroundImage1 from '@/assets/renard_steampunk_fall_ultrawide.jpg';
 import backgroundImage2 from '@/assets/renard_steampunk_fall_evening.jpg';
 import backgroundImage3 from '@/assets/renard_steampunk_fall_workshop.jpg';
@@ -14,6 +19,13 @@ interface WeatherHeroProps {
   isLoading?: boolean;
   error?: string | null;
   onRetry?: () => void;
+  activeProvider: WeatherProvider;
+  onProviderChange: (provider: WeatherProvider) => void;
+  currentLocation: Location;
+  savedLocations: Location[];
+  onLocationChange: (location: Location) => void;
+  onLocationAdd: (location: Location) => void;
+  onLocationRemove: (locationName: string) => void;
 }
 
 export function WeatherHero({
@@ -21,6 +33,13 @@ export function WeatherHero({
   isLoading = false,
   error = null,
   onRetry,
+  activeProvider,
+  onProviderChange,
+  currentLocation,
+  savedLocations,
+  onLocationChange,
+  onLocationAdd,
+  onLocationRemove,
 }: WeatherHeroProps) {
   // Randomly select a background image (memoized so it doesn't change on re-renders)
   const backgroundImage = useMemo(() => {
@@ -103,7 +122,7 @@ export function WeatherHero({
 
   return (
     <section
-      className="relative w-full overflow-hidden pt-[76px] sm:pt-[84px]"
+      className="relative w-full overflow-hidden"
       style={{
         background:
           'linear-gradient(135deg, rgba(26, 26, 46, 0.7) 0%, rgba(36, 36, 56, 0.6) 50%, rgba(46, 46, 66, 0.5) 100%)',
@@ -145,6 +164,42 @@ export function WeatherHero({
           filter: 'blur(40px)',
         }}
       />
+
+      {/* Menu Button - positioned absolutely in top-right */}
+      <div className="absolute top-4 right-4 md:top-6 md:right-6 lg:top-8 lg:right-8 z-20">
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="transition-all duration-300 hover:scale-105 md:hover:scale-110 p-2 md:p-3 h-auto w-auto"
+              style={{
+                background: 'transparent',
+              }}
+              aria-label="Menu"
+            >
+              <Menu
+                className="w-7 h-7 md:w-8 md:h-8 lg:w-9 lg:h-9 xl:w-10 xl:h-10 text-[#e5e7eb]"
+                strokeWidth={2.5}
+                style={{
+                  filter: 'drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6))',
+                }}
+              />
+            </Button>
+          </SheetTrigger>
+          <SheetContent>
+            <AppMenu
+              activeProvider={activeProvider}
+              onProviderChange={onProviderChange}
+              currentLocation={currentLocation}
+              savedLocations={savedLocations}
+              onLocationChange={onLocationChange}
+              onLocationAdd={onLocationAdd}
+              onLocationRemove={onLocationRemove}
+            />
+          </SheetContent>
+        </Sheet>
+      </div>
 
       <div className="relative z-10 p-4 sm:p-6 md:p-8 lg:p-10">
         {renderContent()}

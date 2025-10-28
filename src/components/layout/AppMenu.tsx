@@ -1,9 +1,9 @@
-import { SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
+import { SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { ProviderToggle } from '@/components/weather/ProviderToggle';
 import { LocationSelector } from '@/components/location/LocationSelector';
 import type { WeatherProvider } from '@/config/weather.config';
 import type { Location } from '@/types/location';
-import { Settings2 } from 'lucide-react';
+import renardLogo from '@/assets/renard.png';
 
 interface AppMenuProps {
   activeProvider: WeatherProvider;
@@ -28,13 +28,20 @@ export function AppMenu({
     <div className="flex flex-col h-full">
       {/* Header */}
       <SheetHeader className="border-b border-[#ff6b00]/20 pb-4">
-        <div className="flex items-center gap-2">
-          <Settings2 className="w-5 h-5 text-[#ff6b00]" />
-          <SheetTitle>Menu</SheetTitle>
+        <div className="flex items-center gap-3">
+          <img
+            src={renardLogo}
+            alt="MeteoRenard Logo"
+            className="w-10 h-10 rounded-full object-cover"
+            style={{
+              boxShadow: '0 0 15px rgba(255, 107, 0, 0.3)',
+            }}
+          />
+          <SheetTitle className="font-raleway font-bold text-xl">
+            <span className="text-[#e5e7eb]">Meteo</span>
+            <span className="text-[#ff6b00]">Renard</span>
+          </SheetTitle>
         </div>
-        <SheetDescription>
-          Paramètres et préférences
-        </SheetDescription>
       </SheetHeader>
 
       {/* Content */}

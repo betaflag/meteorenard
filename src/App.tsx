@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Header } from './components/layout/Header';
 import { WeatherHero } from './components/weather/WeatherHero';
 import { HourlyChartWidget } from './components/weather/HourlyChartWidget';
 import { DailyForecastWidget } from './components/weather/DailyForecastWidget';
@@ -152,19 +151,6 @@ function App() {
 
   return (
     <>
-      {/* Header - only show if we have a location */}
-      {currentLocation && (
-        <Header
-          activeProvider={activeProvider}
-          onProviderChange={handleProviderChange}
-          currentLocation={currentLocation}
-          savedLocations={savedLocations}
-          onLocationChange={handleLocationChange}
-          onLocationAdd={handleLocationAdd}
-          onLocationRemove={handleLocationRemove}
-        />
-      )}
-
       {/* Main Content */}
       <div className="min-h-screen">
         {/* Hero Section - Full Width */}
@@ -178,6 +164,13 @@ function App() {
                 fetchWeatherData(activeProvider, currentLocation);
               }
             }}
+            activeProvider={activeProvider}
+            onProviderChange={handleProviderChange}
+            currentLocation={currentLocation}
+            savedLocations={savedLocations}
+            onLocationChange={handleLocationChange}
+            onLocationAdd={handleLocationAdd}
+            onLocationRemove={handleLocationRemove}
           />
         ) : (
           <div className="w-full p-8 text-center">
