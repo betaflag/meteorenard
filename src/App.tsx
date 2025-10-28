@@ -167,7 +167,7 @@ function App() {
 
       {/* Main Content */}
       <div className="min-h-screen">
-        {/* Hero Section - Full Width, Starts Below Header */}
+        {/* Hero Section - Full Width */}
         {currentLocation ? (
           <WeatherHero
             data={weatherData}
@@ -180,7 +180,7 @@ function App() {
             }}
           />
         ) : (
-          <div className="w-full p-8 text-center mt-[76px] sm:mt-[84px]">
+          <div className="w-full p-8 text-center">
             <p className="text-[#e5e7eb] text-lg">
               Veuillez sélectionner une localisation pour afficher la météo
             </p>

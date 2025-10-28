@@ -2,7 +2,7 @@ import { CurrentWeather } from './CurrentWeather';
 import { HourlyForecast } from './HourlyForecast';
 import { CloudOff, RefreshCw } from 'lucide-react';
 import type { WeatherData } from '@/types/weather';
-import { useMemo } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import backgroundImage1 from '@/assets/renard_steampunk_fall_ultrawide.jpg';
 import backgroundImage2 from '@/assets/renard_steampunk_fall_evening.jpg';
 import backgroundImage3 from '@/assets/renard_steampunk_fall_workshop.jpg';
@@ -26,6 +26,18 @@ export function WeatherHero({
   const backgroundImage = useMemo(() => {
     const images = [backgroundImage1, backgroundImage2, backgroundImage3, backgroundImage4, backgroundImage5];
     return images[Math.floor(Math.random() * images.length)];
+  }, []);
+
+  // Parallax scroll effect
+  const [scrollY, setScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const renderContent = () => {
@@ -112,6 +124,8 @@ export function WeatherHero({
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
             opacity: 0.25,
+            transform: `translateY(${scrollY * 0.3}px)`,
+            transition: 'transform 0.1s ease-out',
           }}
         />
         <div
