@@ -5,7 +5,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium font-raleway ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium font-raleway ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
   {
     variants: {
       variant: {
@@ -14,11 +14,11 @@ const buttonVariants = cva(
         destructive:
           'bg-destructive text-destructive-foreground hover:bg-destructive/90',
         outline:
-          'border border-[#ff6b00]/30 bg-transparent text-[#e5e7eb] hover:bg-[#ff6b00]/10 hover:border-[#ff6b00]/50 hover:text-[#ff6b00]',
+          'border border-[#ff6b00]/30 text-[#e5e7eb] hover:border-[#ff6b00]/50 hover:text-[#ff6b00]',
         secondary:
           'bg-secondary text-secondary-foreground hover:bg-secondary/80',
         ghost:
-          'text-[#a8a8a8] hover:bg-[#ff6b00]/10 hover:text-[#ff6b00]',
+          'text-[#a8a8a8] hover:text-[#ff6b00]',
         link: 'text-primary underline-offset-4 hover:underline',
       },
       size: {
@@ -44,9 +44,20 @@ export interface ButtonProps
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : 'button';
+
+    // Apply glassmorphism to outline and ghost variants
+    const glassStyle = (variant === 'outline' || variant === 'ghost') ? {
+      background: 'linear-gradient(135deg, rgba(26, 26, 46, 0.4) 0%, rgba(36, 36, 56, 0.3) 100%)',
+      backdropFilter: 'blur(10px)',
+      boxShadow: variant === 'outline'
+        ? 'inset 0 0 0 1px rgba(255, 255, 255, 0.05)'
+        : 'none',
+    } : undefined;
+
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
+        style={glassStyle}
         ref={ref}
         {...props}
       />

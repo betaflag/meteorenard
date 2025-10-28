@@ -22,7 +22,7 @@ function App() {
   );
 
   // Location state
-  const [currentLocation, setCurrentLocation] = useState<Location>(() =>
+  const [currentLocation, setCurrentLocation] = useState<Location | null>(() =>
     LocationStorageService.getCurrentLocation()
   );
   const [savedLocations, setSavedLocations] = useState<Location[]>(() =>
@@ -31,13 +31,14 @@ function App() {
   const [showLocationPermissionDialog, setShowLocationPermissionDialog] = useState(false);
   const [showCitySearchDialog, setShowCitySearchDialog] = useState(false);
 
-  // Check if we should show location permission dialog on first visit
+  // Check if we should show location permission dialog
   useEffect(() => {
+    // Show dialog if no location is set OR if permission was never requested
     const hasRequested = LocationStorageService.hasRequestedPermission();
-    if (!hasRequested) {
+    if (!currentLocation || !hasRequested) {
       setShowLocationPermissionDialog(true);
     }
-  }, []);
+  }, [currentLocation]);
 
   const fetchWeatherData = useCallback(
     async (provider: WeatherProvider, location: Location) => {
@@ -122,12 +123,20 @@ function App() {
   const handleProviderChange = useCallback(
     (provider: WeatherProvider) => {
       setActiveProvider(provider);
-      fetchWeatherData(provider, currentLocation);
+      if (currentLocation) {
+        fetchWeatherData(provider, currentLocation);
+      }
     },
     [fetchWeatherData, currentLocation]
   );
 
   useEffect(() => {
+    // Only fetch weather data if we have a location
+    if (!currentLocation) {
+      setIsLoading(false);
+      return;
+    }
+
     // Fetch weather data on mount and when location or provider changes
     fetchWeatherData(activeProvider, currentLocation);
 
@@ -143,37 +152,56 @@ function App() {
 
   return (
     <>
-      {/* Header */}
-      <Header
-        activeProvider={activeProvider}
-        onProviderChange={handleProviderChange}
-        currentLocation={currentLocation}
-        savedLocations={savedLocations}
-        onLocationChange={handleLocationChange}
-        onLocationAdd={handleLocationAdd}
-        onLocationRemove={handleLocationRemove}
-      />
+      {/* Header - only show if we have a location */}
+      {currentLocation && (
+        <Header
+          activeProvider={activeProvider}
+          onProviderChange={handleProviderChange}
+          currentLocation={currentLocation}
+          savedLocations={savedLocations}
+          onLocationChange={handleLocationChange}
+          onLocationAdd={handleLocationAdd}
+          onLocationRemove={handleLocationRemove}
+        />
+      )}
 
       {/* Main Content */}
-      <div className="min-h-screen pt-[76px] sm:pt-[84px] p-0 md:px-8 md:pb-8">
+      <div className={`min-h-screen p-0 md:px-8 md:pb-8 ${currentLocation ? 'pt-[76px] sm:pt-[84px]' : 'pt-8'}`}>
         {/* Widgets Container */}
         <div className="flex flex-col gap-6 items-start justify-center px-1 md:px-0">
         {/* Current Weather Widget */}
-        <WeatherWidget
-          data={weatherData}
-          isLoading={isLoading}
-          error={error}
-          onRetry={() => fetchWeatherData(activeProvider, currentLocation)}
-        />
+        {currentLocation ? (
+          <WeatherWidget
+            data={weatherData}
+            isLoading={isLoading}
+            error={error}
+            onRetry={() => {
+              if (currentLocation) {
+                fetchWeatherData(activeProvider, currentLocation);
+              }
+            }}
+          />
+        ) : (
+          <div className="w-full max-w-2xl mx-auto p-8 text-center">
+            <p className="text-[#e5e7eb] text-lg">
+              Veuillez sélectionner une localisation pour afficher la météo
+            </p>
+          </div>
+        )}
 
-        {/* Clothing Forecast Widget */}
-        <ClothingForecastWidget data={weatherData} />
+        {/* Only show other widgets if we have a location and weather data */}
+        {currentLocation && (
+          <>
+            {/* Clothing Forecast Widget */}
+            <ClothingForecastWidget data={weatherData} />
 
-        {/* Hourly Chart Widget */}
-        <HourlyChartWidget data={weatherData} />
+            {/* Hourly Chart Widget */}
+            <HourlyChartWidget data={weatherData} />
 
-        {/* 10-Day Forecast Widget */}
-        <DailyForecastWidget data={weatherData} />
+            {/* 10-Day Forecast Widget */}
+            <DailyForecastWidget data={weatherData} />
+          </>
+        )}
         </div>
       </div>
 

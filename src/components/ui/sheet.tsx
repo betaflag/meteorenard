@@ -19,10 +19,10 @@ const SheetOverlay = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SheetPrimitive.Overlay
     className={cn(
-      'fixed inset-0 z-50 bg-black/60 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+      'fixed inset-0 z-50 bg-black/70 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
       className
     )}
-    style={{ backdropFilter: 'blur(4px)' }}
+    style={{ backdropFilter: 'blur(12px)' }}
     {...props}
     ref={ref}
   />
@@ -63,9 +63,13 @@ const SheetContent = React.forwardRef<
       className={cn(sheetVariants({ side }), 'border-[#ff6b00]/30', className)}
       style={{
         background:
-          'linear-gradient(135deg, rgba(26, 26, 46, 0.98) 0%, rgba(36, 36, 56, 0.98) 100%)',
+          'linear-gradient(135deg, rgba(26, 26, 46, 0.96) 0%, rgba(36, 36, 56, 0.95) 100%)',
         backdropFilter: 'blur(20px)',
-        boxShadow: '0 10px 50px rgba(0, 0, 0, 0.5), 0 0 40px rgba(255, 107, 0, 0.15)',
+        boxShadow: `
+          0 10px 50px rgba(0, 0, 0, 0.5),
+          0 0 40px rgba(255, 107, 0, 0.15),
+          inset 0 0 0 1px rgba(255, 255, 255, 0.08)
+        `,
       }}
       {...props}
     >

@@ -1,5 +1,4 @@
 import type { Location } from '@/types/location';
-import { DEFAULT_LOCATION } from '@/types/location';
 
 /**
  * Local storage keys
@@ -16,9 +15,9 @@ const STORAGE_KEYS = {
 export class LocationStorageService {
   /**
    * Get the current location from localStorage
-   * @returns Current location or default (Montréal) if not set
+   * @returns Current location or null if not set
    */
-  static getCurrentLocation(): Location {
+  static getCurrentLocation(): Location | null {
     try {
       const stored = localStorage.getItem(STORAGE_KEYS.CURRENT_LOCATION);
       if (stored) {
@@ -31,7 +30,7 @@ export class LocationStorageService {
     } catch (error) {
       console.error('Error reading current location from localStorage:', error);
     }
-    return DEFAULT_LOCATION;
+    return null;
   }
 
   /**
@@ -51,7 +50,7 @@ export class LocationStorageService {
 
   /**
    * Get all saved locations from localStorage
-   * @returns Array of saved locations (default: Montréal only)
+   * @returns Array of saved locations (empty array if none saved)
    */
   static getSavedLocations(): Location[] {
     try {
@@ -66,8 +65,8 @@ export class LocationStorageService {
     } catch (error) {
       console.error('Error reading saved locations from localStorage:', error);
     }
-    // Default to Montréal
-    return [DEFAULT_LOCATION];
+    // Return empty array if no locations saved
+    return [];
   }
 
   /**
@@ -103,11 +102,9 @@ export class LocationStorageService {
     const savedLocations = this.getSavedLocations();
     const filtered = savedLocations.filter((loc) => loc.name !== locationName);
 
-    // Ensure at least one location remains (default)
-    const updated = filtered.length > 0 ? filtered : [DEFAULT_LOCATION];
-    this.setSavedLocations(updated);
+    this.setSavedLocations(filtered);
 
-    return updated;
+    return filtered;
   }
 
   /**

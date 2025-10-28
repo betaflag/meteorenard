@@ -1,4 +1,5 @@
 import type { Location, GeolocationError } from '@/types/location';
+import { ReverseGeocodingService } from '@/services/geocoding/ReverseGeocodingService';
 
 /**
  * Result of a geolocation request
@@ -50,12 +51,21 @@ export class GeolocationService {
 
       navigator.geolocation.getCurrentPosition(
         // Success callback
-        (position) => {
+        async (position) => {
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+
+          // Try to get city name via reverse geocoding
+          const geocodedLocation = await ReverseGeocodingService.reverseGeocode(
+            latitude,
+            longitude
+          );
+
           resolve({
-            location: {
+            location: geocodedLocation || {
               name: 'Ma position',
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude,
+              latitude,
+              longitude,
             },
             error: null,
           });

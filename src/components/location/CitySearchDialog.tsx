@@ -6,8 +6,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Search, MapPin, Loader2, Globe } from 'lucide-react';
+import { Search, MapPin, Loader2, Globe, Navigation } from 'lucide-react';
 import { GeocodingService, type CitySearchResult } from '@/services/geocoding/GeocodingService';
+import { GeolocationService } from '@/services/geolocation/GeolocationService';
 import type { Location } from '@/types/location';
 
 interface CitySearchDialogProps {
@@ -25,6 +26,7 @@ export function CitySearchDialog({
   const [searchResults, setSearchResults] = useState<CitySearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showPopularCities, setShowPopularCities] = useState(true);
+  const [isDetectingLocation, setIsDetectingLocation] = useState(false);
 
   const popularCities = GeocodingService.getPopularCities();
 
@@ -66,6 +68,19 @@ export function CitySearchDialog({
     handleCitySelect(location);
   };
 
+  const handleAutoDetect = async () => {
+    setIsDetectingLocation(true);
+    const result = await GeolocationService.getCurrentPosition();
+    setIsDetectingLocation(false);
+
+    if (result.location) {
+      handleCitySelect(result.location);
+    } else if (result.error) {
+      // Show error message to user
+      alert(result.error.message);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px] max-h-[80vh] overflow-hidden flex flex-col">
@@ -91,6 +106,34 @@ export function CitySearchDialog({
           />
         </div>
 
+        {/* Auto-detect Location Button */}
+        <button
+          onClick={handleAutoDetect}
+          disabled={isDetectingLocation}
+          className="w-full flex items-center justify-center gap-2 p-3 rounded-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          style={{
+            background: 'linear-gradient(135deg, rgba(255, 107, 0, 0.15) 0%, rgba(255, 107, 0, 0.08) 100%)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 107, 0, 0.3)',
+          }}
+        >
+          {isDetectingLocation ? (
+            <>
+              <Loader2 className="w-4 h-4 text-[#ff6b00] animate-spin" />
+              <span className="text-sm font-medium text-[#ff6b00]">
+                Détection en cours...
+              </span>
+            </>
+          ) : (
+            <>
+              <Navigation className="w-4 h-4 text-[#ff6b00]" />
+              <span className="text-sm font-medium text-[#ff6b00]">
+                Détecter ma position automatiquement
+              </span>
+            </>
+          )}
+        </button>
+
         {/* Results Area */}
         <div className="flex-1 overflow-y-auto min-h-[300px] -mx-6 px-6">
           {isSearching && (
@@ -109,7 +152,20 @@ export function CitySearchDialog({
                 <button
                   key={`${result.latitude}-${result.longitude}-${index}`}
                   onClick={() => handleSearchResultClick(result)}
-                  className="w-full flex items-center gap-3 p-3 rounded-md hover:bg-[#ff6b00]/10 transition-colors text-left group"
+                  className="w-full flex items-center gap-3 p-3 rounded-md transition-all text-left group"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(26, 26, 46, 0.3) 0%, rgba(36, 36, 56, 0.2) 100%)',
+                    backdropFilter: 'blur(8px)',
+                    boxShadow: 'inset 0 0 0 1px rgba(255, 255, 255, 0.03)',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255, 107, 0, 0.1) 0%, rgba(255, 107, 0, 0.05) 100%)';
+                    e.currentTarget.style.boxShadow = 'inset 0 0 0 1px rgba(255, 107, 0, 0.2)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'linear-gradient(135deg, rgba(26, 26, 46, 0.3) 0%, rgba(36, 36, 56, 0.2) 100%)';
+                    e.currentTarget.style.boxShadow = 'inset 0 0 0 1px rgba(255, 255, 255, 0.03)';
+                  }}
                 >
                   <MapPin className="w-4 h-4 text-[#a8a8a8] group-hover:text-[#ff6b00] flex-shrink-0" />
                   <div className="flex-1 min-w-0">
@@ -145,7 +201,20 @@ export function CitySearchDialog({
                 <button
                   key={`${city.latitude}-${city.longitude}`}
                   onClick={() => handlePopularCityClick(city)}
-                  className="w-full flex items-center gap-3 p-3 rounded-md hover:bg-[#ff6b00]/10 transition-colors text-left group"
+                  className="w-full flex items-center gap-3 p-3 rounded-md transition-all text-left group"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(26, 26, 46, 0.3) 0%, rgba(36, 36, 56, 0.2) 100%)',
+                    backdropFilter: 'blur(8px)',
+                    boxShadow: 'inset 0 0 0 1px rgba(255, 255, 255, 0.03)',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255, 107, 0, 0.1) 0%, rgba(255, 107, 0, 0.05) 100%)';
+                    e.currentTarget.style.boxShadow = 'inset 0 0 0 1px rgba(255, 107, 0, 0.2)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'linear-gradient(135deg, rgba(26, 26, 46, 0.3) 0%, rgba(36, 26, 56, 0.2) 100%)';
+                    e.currentTarget.style.boxShadow = 'inset 0 0 0 1px rgba(255, 255, 255, 0.03)';
+                  }}
                 >
                   <MapPin className="w-4 h-4 text-[#a8a8a8] group-hover:text-[#ff6b00] flex-shrink-0" />
                   <p className="text-sm font-medium text-[#e5e7eb] group-hover:text-[#ff6b00]">

@@ -24,7 +24,17 @@ export function DailyItem({ data, tempRange }: DailyItemProps) {
       condition === 'thunderstorm');
 
   return (
-    <div className="flex items-center gap-3 sm:gap-4 md:gap-6 py-3 border-b border-[#e5e7eb]/10 last:border-b-0">
+    <div
+      className="flex items-center gap-3 sm:gap-4 md:gap-6 py-4 px-3 sm:px-4 rounded-lg mb-2 last:mb-0 transition-all duration-200 hover:scale-[1.01]"
+      style={{
+        background: 'linear-gradient(135deg, rgba(26, 26, 46, 0.3) 0%, rgba(36, 36, 56, 0.2) 100%)',
+        backdropFilter: 'blur(8px)',
+        boxShadow: `
+          0 2px 10px rgba(0, 0, 0, 0.15),
+          inset 0 0 0 1px rgba(255, 255, 255, 0.03)
+        `,
+      }}
+    >
       {/* Day Label */}
       <div className="w-16 sm:w-20 flex-shrink-0">
         <span className="text-[#e5e7eb] font-raleway font-medium text-sm sm:text-base">

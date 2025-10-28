@@ -32,12 +32,3 @@ export interface GeolocationState {
   isLoading: boolean;
   error: GeolocationError | null;
 }
-
-/**
- * Default location (Montreal)
- */
-export const DEFAULT_LOCATION: Location = {
-  name: 'Montréal',
-  latitude: 45.5017,
-  longitude: -73.5673,
-};

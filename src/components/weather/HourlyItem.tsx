@@ -9,7 +9,17 @@ interface HourlyItemProps {
 
 export function HourlyItem({ data, className }: HourlyItemProps) {
   return (
-    <div className={cn('flex flex-col items-center justify-center gap-2 sm:gap-3 md:gap-4 lg:gap-5 flex-1', className)}>
+    <div
+      className={cn('flex flex-col items-center justify-center gap-2 sm:gap-3 md:gap-4 lg:gap-5 flex-1 p-3 sm:p-4 rounded-xl', className)}
+      style={{
+        background: 'linear-gradient(135deg, rgba(26, 26, 46, 0.4) 0%, rgba(36, 36, 56, 0.3) 100%)',
+        backdropFilter: 'blur(10px)',
+        boxShadow: `
+          0 4px 15px rgba(0, 0, 0, 0.2),
+          inset 0 0 0 1px rgba(255, 255, 255, 0.05)
+        `,
+      }}
+    >
       {/* Time */}
       <span
         className="text-xs sm:text-sm md:text-base text-[#e8e8e8] font-light tracking-wide"

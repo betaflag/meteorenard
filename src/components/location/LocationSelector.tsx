@@ -5,7 +5,7 @@ import { CitySearchDialog } from './CitySearchDialog';
 import type { Location } from '@/types/location';
 
 interface LocationSelectorProps {
-  currentLocation: Location;
+  currentLocation: Location | null;
   savedLocations: Location[];
   onLocationChange: (location: Location) => void;
   onLocationAdd: (location: Location) => void;
@@ -28,19 +28,6 @@ export function LocationSelector({
 
   return (
     <div className="space-y-4">
-      {/* Current Location */}
-      <div>
-        <h3 className="text-sm font-semibold text-[#e5e7eb] uppercase tracking-wider mb-3">
-          Position actuelle
-        </h3>
-        <div className="flex items-center gap-2 p-3 bg-[#ff6b00]/10 border border-[#ff6b00]/30 rounded-md">
-          <MapPin className="w-4 h-4 text-[#ff6b00] flex-shrink-0" />
-          <span className="text-sm font-medium text-[#e5e7eb] flex-1">
-            {currentLocation.name}
-          </span>
-        </div>
-      </div>
-
       {/* Saved Locations */}
       <div>
         <div className="flex items-center justify-between mb-3">
@@ -59,20 +46,37 @@ export function LocationSelector({
         </div>
 
         <div className="space-y-1">
-          {savedLocations.map((location) => {
-            const isCurrent = location.name === currentLocation.name;
+          {savedLocations.length === 0 ? (
+            <p className="text-sm text-[#a8a8a8] italic p-2">
+              Aucune ville sauvegardée
+            </p>
+          ) : (
+            savedLocations.map((location) => {
+              const isCurrent = currentLocation?.name === location.name;
 
             return (
               <div
                 key={location.name}
                 className={`
-                  flex items-center gap-2 p-2 rounded-md transition-colors
+                  flex items-center gap-2 p-2 rounded-md transition-all
                   ${
                     isCurrent
-                      ? 'bg-[#ff6b00]/10 border border-[#ff6b00]/30'
-                      : 'hover:bg-[#2a2a2a]'
+                      ? 'border border-[#ff6b00]/30'
+                      : 'border border-transparent hover:border-[#ff6b00]/20'
                   }
                 `}
+                style={
+                  isCurrent
+                    ? {
+                        background: 'linear-gradient(135deg, rgba(255, 107, 0, 0.15) 0%, rgba(255, 107, 0, 0.08) 100%)',
+                        backdropFilter: 'blur(10px)',
+                        boxShadow: 'inset 0 0 0 1px rgba(255, 107, 0, 0.1)',
+                      }
+                    : {
+                        background: 'linear-gradient(135deg, rgba(26, 26, 46, 0.3) 0%, rgba(36, 36, 56, 0.2) 100%)',
+                        backdropFilter: 'blur(8px)',
+                      }
+                }
               >
                 <button
                   onClick={() => onLocationChange(location)}
@@ -95,8 +99,8 @@ export function LocationSelector({
                   </span>
                 </button>
 
-                {/* Remove button - only show if there's more than one location and it's not current */}
-                {savedLocations.length > 1 && !isCurrent && (
+                {/* Remove button - only show if it's not the current location */}
+                {!isCurrent && (
                   <button
                     onClick={() => onLocationRemove(location.name)}
                     className="p-1 hover:bg-[#ff6b00]/10 rounded transition-colors"
@@ -107,7 +111,8 @@ export function LocationSelector({
                 )}
               </div>
             );
-          })}
+            })
+          )}
         </div>
       </div>
 
