@@ -28,7 +28,7 @@ export function ProviderToggle({
     },
     {
       value: 'msc-geomet',
-      label: 'Environnement Canada',
+      label: 'Environnement Canada (preview)',
       description: 'Données officielles d\'EC',
     },
   ];

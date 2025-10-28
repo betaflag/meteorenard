@@ -10,7 +10,7 @@ interface HourlyItemProps {
 export function HourlyItem({ data, className }: HourlyItemProps) {
   return (
     <div
-      className={cn('flex flex-col items-center justify-center gap-2 sm:gap-3 md:gap-4 lg:gap-5 flex-1 p-3 sm:p-4 rounded-xl', className)}
+      className={cn('flex flex-col items-center justify-center gap-1.5 sm:gap-2 md:gap-2.5 flex-1 p-2 sm:p-3 rounded-xl', className)}
       style={{
         background: 'linear-gradient(135deg, rgba(26, 26, 46, 0.4) 0%, rgba(36, 36, 56, 0.3) 100%)',
         backdropFilter: 'blur(10px)',
@@ -22,24 +22,24 @@ export function HourlyItem({ data, className }: HourlyItemProps) {
     >
       {/* Time */}
       <span
-        className="text-xs sm:text-sm md:text-base text-[#e8e8e8] font-light tracking-wide"
+        className="text-xs sm:text-sm text-[#e8e8e8] font-light tracking-wide"
         style={{ fontFamily: 'Raleway, sans-serif' }}
       >
         {data.time}
       </span>
 
       {/* Weather Icon */}
-      <div className="h-[32px] sm:h-[48px] md:h-[56px] lg:h-[60px] flex items-center justify-center">
+      <div className="h-[28px] sm:h-[40px] md:h-[44px] flex items-center justify-center">
         <WeatherIcon
           condition={data.condition}
           size={32}
-          className="text-[#ff6b00] opacity-70 w-[32px] h-[32px] sm:w-[48px] sm:h-[48px] md:w-[56px] md:h-[56px]"
+          className="text-[#ff6b00] opacity-70 w-[28px] h-[28px] sm:w-[40px] sm:h-[40px] md:w-[44px] md:h-[44px]"
         />
       </div>
 
       {/* Temperature */}
       <span
-        className="text-sm sm:text-base md:text-lg lg:text-xl font-light text-[#e8e8e8]"
+        className="text-sm sm:text-base md:text-lg font-light text-[#e8e8e8]"
         style={{ fontFamily: 'Raleway, sans-serif' }}
       >
         {Math.round(data.temp)}°

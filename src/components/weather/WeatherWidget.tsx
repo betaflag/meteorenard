@@ -3,6 +3,12 @@ import { CurrentWeather } from './CurrentWeather';
 import { HourlyForecast } from './HourlyForecast';
 import { CloudOff, RefreshCw } from 'lucide-react';
 import type { WeatherData } from '@/types/weather';
+import { useMemo } from 'react';
+import backgroundImage1 from '@/assets/renard_steampunk_fall_ultrawide.jpg';
+import backgroundImage2 from '@/assets/renard_steampunk_fall_evening.jpg';
+import backgroundImage3 from '@/assets/renard_steampunk_fall_workshop.jpg';
+import backgroundImage4 from '@/assets/renard_steampunk_fall_park.jpg';
+import backgroundImage5 from '@/assets/renard_steampunk_fall_rooftop.jpg';
 
 interface WeatherWidgetProps {
   data: WeatherData | null;
@@ -17,6 +23,12 @@ export function WeatherWidget({
   error = null,
   onRetry,
 }: WeatherWidgetProps) {
+  // Randomly select a background image (memoized so it doesn't change on re-renders)
+  const backgroundImage = useMemo(() => {
+    const images = [backgroundImage1, backgroundImage2, backgroundImage3, backgroundImage4, backgroundImage5];
+    return images[Math.floor(Math.random() * images.length)];
+  }, []);
+
   const renderContent = () => {
     // Loading state
     if (isLoading && !data) {
@@ -92,6 +104,26 @@ export function WeatherWidget({
         `,
       }}
     >
+      {/* Background image with gradient fade (more visible top-right, fades to bottom-left) */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            opacity: 0.25,
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(225deg, transparent 0%, transparent 30%, rgba(26, 26, 46, 0.7) 60%, rgba(26, 26, 46, 0.95) 100%)',
+          }}
+        />
+      </div>
+
       {/* Floating glow effect */}
       <div
         className="absolute -top-1/2 -right-1/2 w-[200%] h-[200%] pointer-events-none opacity-30"

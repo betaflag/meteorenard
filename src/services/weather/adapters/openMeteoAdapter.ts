@@ -68,7 +68,8 @@ function formatTime(isoString: string): string {
  * Get day label (Mon, Tue, etc.) from date
  */
 function getDayLabel(dateString: string): string {
-  const date = new Date(dateString);
+  // Parse as UTC noon to avoid timezone shift issues
+  const date = new Date(dateString + 'T12:00:00Z');
   const dayNames = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
   return dayNames[date.getDay()];
 }
@@ -98,8 +99,8 @@ export function adaptOpenMeteoResponse(
     }))
     .filter((hour) => new Date(hour.time) >= now);
 
-  // Take first 8 hours for the hourly forecast widget
-  const hourlyData = hourlyDataFull.slice(0, 8).map((hour) => ({
+  // Take first 24 hours for the hourly forecast widget
+  const hourlyData = hourlyDataFull.slice(0, 24).map((hour) => ({
     time: formatTime(hour.time),
     temp: hour.temp,
     condition: mapWeatherCode(hour.weathercode),
@@ -112,15 +113,15 @@ export function adaptOpenMeteoResponse(
 
   // Get 10-day daily forecast (skip today, start from tomorrow)
   const dailyData = response.daily.time
-    .slice(1, 11) // Skip index 0 (today), take days 1-10
     .map((date, index) => ({
       date,
       dayLabel: getDayLabel(date),
-      tempLow: Math.round(response.daily.temperature_2m_min[index + 1]),
-      tempHigh: Math.round(response.daily.temperature_2m_max[index + 1]),
-      condition: mapWeatherCode(response.daily.weathercode[index + 1]),
-      precipitationProbability: response.daily.precipitation_probability_max[index + 1],
-    }));
+      tempLow: Math.round(response.daily.temperature_2m_min[index]),
+      tempHigh: Math.round(response.daily.temperature_2m_max[index]),
+      condition: mapWeatherCode(response.daily.weathercode[index]),
+      precipitationProbability: response.daily.precipitation_probability_max[index],
+    }))
+    .slice(1, 11); // Skip index 0 (today), take days 1-10
 
   return {
     current: {

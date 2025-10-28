@@ -36,7 +36,7 @@ export function DailyForecastWidget({ data }: DailyForecastWidgetProps) {
         }}
       />
 
-      <CardContent className="relative z-10 p-4 sm:p-6 md:p-8 lg:p-10">
+      <CardContent className="relative z-10 p-2 sm:p-6 md:p-8 lg:p-10">
         <DailyForecast data={data.daily} />
       </CardContent>
     </Card>
