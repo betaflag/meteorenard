@@ -5,9 +5,9 @@ import { Droplets } from 'lucide-react';
 import { getClothingIcon } from '@/services/clothing/clothingIconMap';
 
 // Import time block banner images
-import morningBanner from '@/assets/timeblocks/morning_banner.png';
-import afternoonBanner from '@/assets/timeblocks/afternoon_banner.png';
-import eveningBanner from '@/assets/timeblocks/evening_banner.png';
+import morningBanner from '@/assets/timeblocks/morning_banner.jpg';
+import afternoonBanner from '@/assets/timeblocks/afternoon_banner.jpg';
+import eveningBanner from '@/assets/timeblocks/evening_banner.jpg';
 
 interface TimeBlockCardProps {
   data: TimeBlockData;
@@ -16,9 +16,9 @@ interface TimeBlockCardProps {
 
 // Get banner image based on time block label
 const getTimeBlockBanner = (label: string): string | undefined => {
-  if (label.includes('8h-12h')) return morningBanner;
-  if (label.includes('12h-17h')) return afternoonBanner;
-  if (label.includes('18h-22h')) return eveningBanner;
+  if (label.includes('Matin') || label.includes('8h-12h')) return morningBanner;
+  if (label.includes('Après-midi') || label.includes('12h-17h')) return afternoonBanner;
+  if (label.includes('Soirée') || label.includes('18h-22h')) return eveningBanner;
   return undefined;
 };
 
@@ -46,17 +46,11 @@ export function TimeBlockCard({ data, isHighlighted = false }: TimeBlockCardProp
 
   return (
     <Card
-      className={`relative w-full overflow-hidden rounded-xl ${
-        isHighlighted ? 'border-[#ff6b00]/70' : 'border-[#ff6b00]/25'
-      }`}
+      className="relative w-full overflow-hidden rounded-xl border-white/10"
       style={{
-        background: isHighlighted
-          ? 'linear-gradient(135deg, rgba(26, 26, 46, 0.95) 0%, rgba(36, 36, 56, 0.85) 100%)'
-          : 'linear-gradient(135deg, rgba(26, 26, 46, 0.6) 0%, rgba(36, 36, 56, 0.5) 100%)',
+        background: 'linear-gradient(135deg, rgba(30, 35, 42, 0.7) 0%, rgba(40, 45, 52, 0.6) 100%)',
         backdropFilter: 'blur(15px)',
-        boxShadow: isHighlighted
-          ? '0 10px 40px rgba(0, 0, 0, 0.5), inset 0 0 0 2px rgba(255, 107, 0, 0.25)'
-          : '0 10px 30px rgba(0, 0, 0, 0.4), 0 0 20px rgba(255, 107, 0, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.05)',
+        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.05)',
       }}
     >
       {/* Header section with banner background - extends to card edges */}
@@ -64,24 +58,26 @@ export function TimeBlockCard({ data, isHighlighted = false }: TimeBlockCardProp
         {/* Banner background image */}
         {bannerImage && (
           <div
-            className="absolute inset-0 bg-cover bg-center pointer-events-none"
+            className="absolute inset-0 pointer-events-none"
             style={{
               backgroundImage: `url(${bannerImage})`,
-              opacity: 0.2,
-              mixBlendMode: 'soft-light',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              maskImage: 'linear-gradient(to top right, rgba(0,0,0,0) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.5) 100%)',
+              WebkitMaskImage: 'linear-gradient(to top right, rgba(0,0,0,0) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.5) 100%)',
             }}
           />
         )}
 
         {/* Header content */}
-        <div className="relative p-4">
+        <div className="relative px-6 py-6">
           {/* Time label and next day indicator */}
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-[#ff6b00] font-raleway font-semibold text-sm sm:text-base">
               {label}
             </h3>
             {isNextDay && (
-              <span className="text-[#a8a8a8] text-xs font-raleway italic">Demain</span>
+              <span className="text-[#a8a8a8] text-xs font-raleway italic bg-[#1a1a2e]/80 px-2 py-1 rounded backdrop-blur-sm">Demain</span>
             )}
           </div>
 
@@ -90,7 +86,7 @@ export function TimeBlockCard({ data, isHighlighted = false }: TimeBlockCardProp
             <WeatherIcon condition={condition} className="w-10 h-10 sm:w-12 sm:h-12 text-[#ff6b00]" />
             <div className="flex flex-col">
               <span className="text-white font-raleway text-2xl sm:text-3xl font-bold">
-                {temperature}°
+                {Math.round(temperature)}°
               </span>
               {precipitationProbability !== undefined && precipitationProbability > 0 && (
                 <div className="flex items-center gap-1 text-[#4fc3f7] text-xs sm:text-sm">
@@ -102,12 +98,12 @@ export function TimeBlockCard({ data, isHighlighted = false }: TimeBlockCardProp
           </div>
         </div>
 
-        {/* Orange border at bottom of header */}
-        <div className="h-[2px] w-full bg-gradient-to-r from-[#ff6b00]/20 via-[#ff6b00]/60 to-[#ff6b00]/20" />
+        {/* Subtle border at bottom of header */}
+        <div className="h-[2px] w-full bg-white/10" />
       </div>
 
       {/* Clothing items section */}
-      <CardContent className="p-4">
+      <CardContent className="px-4 pt-2 pb-4">
         <div className="flex flex-col gap-2">
           {displayItems.map((item, index) => {
             const iconFilename = getClothingIcon(item.id);
@@ -116,7 +112,7 @@ export function TimeBlockCard({ data, isHighlighted = false }: TimeBlockCardProp
             return (
               <div
                 key={`${item.id}-${index}`}
-                className="flex items-center gap-2 p-2 rounded-lg bg-[#1a1a2e]/50"
+                className="flex items-center gap-2 p-2 rounded-lg bg-[#1e232a]/50"
               >
                 {iconUrl ? (
                   <img

@@ -11,7 +11,7 @@ export function HourlyForecast({ data }: HourlyForecastProps) {
   const displayData = data.slice(0, maxHours);
 
   return (
-    <div className="mt-6 sm:mt-8 md:mt-10">
+    <div className="mt-8 sm:mt-12 md:mt-16 lg:mt-20">
       <div className="grid grid-flow-col auto-cols-fr gap-1 sm:gap-2 md:gap-3">
         {displayData.map((hour, index) => (
           <div

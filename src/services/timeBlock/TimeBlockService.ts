@@ -9,19 +9,19 @@ import { ClothingRecommendationService } from '../clothing/ClothingRecommendatio
 const TIME_BLOCKS: TimeBlockConfig[] = [
   {
     period: Period.MORNING,
-    label: '8h-12h',
+    label: 'Matin (8h-12h)',
     startHour: 8,
     endHour: 12,
   },
   {
     period: Period.AFTERNOON,
-    label: '12h-17h',
+    label: 'Après-midi (12h-17h)',
     startHour: 12,
     endHour: 17,
   },
   {
     period: Period.EVENING,
-    label: '18h-22h',
+    label: 'Soirée (18h-22h)',
     startHour: 18,
     endHour: 22,
   },

@@ -7,7 +7,7 @@ interface CurrentWeatherProps {
 
 export function CurrentWeather({ data }: CurrentWeatherProps) {
   return (
-    <div className="space-y-3 sm:space-y-4 md:space-y-6">
+    <div className="space-y-4 sm:space-y-6 md:space-y-8 lg:space-y-10">
       {/* Location - Full width */}
       <h2
         className="text-xl sm:text-2xl md:text-3xl font-semibold text-left text-[#e8e8e8] tracking-wide"

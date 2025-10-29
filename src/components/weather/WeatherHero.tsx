@@ -143,7 +143,7 @@ export function WeatherHero({
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
             opacity: 0.25,
-            transform: `translateY(${scrollY * 0.3}px)`,
+            transform: `translateY(${scrollY * 0.35}px)`,
             transition: 'transform 0.1s ease-out',
           }}
         />
@@ -201,7 +201,7 @@ export function WeatherHero({
         </Sheet>
       </div>
 
-      <div className="relative z-10 p-4 sm:p-6 md:p-8 lg:p-10">
+      <div className="relative z-10 pt-16 sm:pt-20 md:pt-24 lg:pt-28 pb-8 sm:pb-12 md:pb-16 lg:pb-20 px-6 sm:px-8 md:px-12 lg:px-16">
         {renderContent()}
       </div>
     </section>

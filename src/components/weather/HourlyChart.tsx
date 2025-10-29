@@ -219,7 +219,7 @@ export function HourlyChart({ data }: HourlyChartProps) {
             verticalAlign="bottom"
             height={isMobile ? 30 : 36}
             wrapperStyle={{
-              paddingTop: isMobile ? '10px' : '15px',
+              paddingTop: isMobile ? '5px' : '8px',
               fontFamily: 'Raleway, sans-serif',
               fontSize: isMobile ? '10px' : '12px',
             }}
