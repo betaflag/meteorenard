@@ -31,7 +31,7 @@ const getClothingIconUrl = (iconFilename: string) => {
   }
 };
 
-export function TimeBlockCard({ data, isHighlighted = false }: TimeBlockCardProps) {
+export function TimeBlockCard({ data, isHighlighted: _isHighlighted = false }: TimeBlockCardProps) {
   const {
     label,
     temperature,
