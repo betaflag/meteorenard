@@ -166,13 +166,15 @@ export class TimeBlockService {
    * @param hourlyData - Hourly weather forecast data
    * @param isNextDay - Whether this block is for tomorrow
    * @param weatherData - Full weather data including current and daily
+   * @param preschoolMode - If true, adjusts clothing recommendations for children aged 2-5 years
    * @returns TimeBlockData with weather and clothing recommendations
    */
   private static mapWeatherToTimeBlock(
     config: TimeBlockConfig,
     hourlyData: HourlyWeather[],
     isNextDay: boolean,
-    weatherData: WeatherData | null
+    weatherData: WeatherData | null,
+    preschoolMode: boolean = false
   ): TimeBlockData {
     // Get average weather data for this time block range
     const avgWeather = this.getAverageWeatherForBlock(
@@ -227,7 +229,7 @@ export class TimeBlockService {
     }
 
     // Get clothing recommendations based on temperature
-    const clothingItems = ClothingRecommendationService.getRecommendations(temperature);
+    const clothingItems = ClothingRecommendationService.getRecommendations(temperature, preschoolMode);
 
     return {
       period: config.period,
@@ -246,23 +248,25 @@ export class TimeBlockService {
    * Get time blocks with weather data and clothing recommendations
    * @param weatherData - Weather data from API
    * @param currentHour - Current hour (defaults to now)
+   * @param preschoolMode - If true, adjusts clothing recommendations for children aged 2-5 years
    * @returns Array of 3 TimeBlockData objects
    */
   static getTimeBlocksWithWeather(
     weatherData: WeatherData | null,
-    currentHour?: number
+    currentHour?: number,
+    preschoolMode: boolean = false
   ): TimeBlockData[] {
     if (!weatherData || !weatherData.hourly || weatherData.hourly.length === 0) {
       // Return empty blocks with default data
       return this.getNextTimeBlocks(3, currentHour).map(({ config, isNextDay }) =>
-        this.mapWeatherToTimeBlock(config, [], isNextDay, weatherData)
+        this.mapWeatherToTimeBlock(config, [], isNextDay, weatherData, preschoolMode)
       );
     }
 
     const nextBlocks = this.getNextTimeBlocks(3, currentHour);
 
     return nextBlocks.map(({ config, isNextDay }) =>
-      this.mapWeatherToTimeBlock(config, weatherData.hourly, isNextDay, weatherData)
+      this.mapWeatherToTimeBlock(config, weatherData.hourly, isNextDay, weatherData, preschoolMode)
     );
   }
 }

@@ -26,6 +26,8 @@ interface WeatherHeroProps {
   onLocationChange: (location: Location) => void;
   onLocationAdd: (location: Location) => void;
   onLocationRemove: (locationName: string) => void;
+  preschoolMode: boolean;
+  onPreschoolModeChange: (enabled: boolean) => void;
 }
 
 export function WeatherHero({
@@ -40,6 +42,8 @@ export function WeatherHero({
   onLocationChange,
   onLocationAdd,
   onLocationRemove,
+  preschoolMode,
+  onPreschoolModeChange,
 }: WeatherHeroProps) {
   // Randomly select a background image (memoized so it doesn't change on re-renders)
   const backgroundImage = useMemo(() => {
@@ -196,6 +200,8 @@ export function WeatherHero({
               onLocationChange={onLocationChange}
               onLocationAdd={onLocationAdd}
               onLocationRemove={onLocationRemove}
+              preschoolMode={preschoolMode}
+              onPreschoolModeChange={onPreschoolModeChange}
             />
           </SheetContent>
         </Sheet>

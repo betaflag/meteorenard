@@ -8,6 +8,7 @@ import { LocationPermissionDialog } from './components/location/LocationPermissi
 import { CitySearchDialog } from './components/location/CitySearchDialog';
 import { WeatherServiceFactory } from './services/weather/WeatherServiceFactory';
 import { LocationStorageService } from './services/location/LocationStorageService';
+import { PreferencesStorageService } from './services/preferences/PreferencesStorageService';
 import { weatherConfig, type WeatherProvider } from './config/weather.config';
 import type { WeatherData } from './types/weather';
 import type { Location } from './types/location';
@@ -30,6 +31,11 @@ function AppContent() {
   );
   const [showLocationPermissionDialog, setShowLocationPermissionDialog] = useState(false);
   const [showCitySearchDialog, setShowCitySearchDialog] = useState(false);
+
+  // Preferences state
+  const [preschoolMode, setPreschoolMode] = useState<boolean>(() =>
+    PreferencesStorageService.getPreschoolMode()
+  );
 
   // Check if we should show location permission dialog
   useEffect(() => {
@@ -130,6 +136,12 @@ function AppContent() {
     [fetchWeatherData, currentLocation]
   );
 
+  // Handle preschool mode toggle
+  const handlePreschoolModeChange = useCallback((enabled: boolean) => {
+    setPreschoolMode(enabled);
+    PreferencesStorageService.setPreschoolMode(enabled);
+  }, []);
+
   useEffect(() => {
     // Only fetch weather data if we have a location
     if (!currentLocation) {
@@ -172,6 +184,8 @@ function AppContent() {
             onLocationChange={handleLocationChange}
             onLocationAdd={handleLocationAdd}
             onLocationRemove={handleLocationRemove}
+            preschoolMode={preschoolMode}
+            onPreschoolModeChange={handlePreschoolModeChange}
           />
         ) : (
           <div className="w-full p-8 text-center">
@@ -185,7 +199,7 @@ function AppContent() {
         {currentLocation && (
           <div className="max-w-[1400px] mx-auto flex flex-col gap-6 items-start justify-center px-4 md:px-8 py-6">
             {/* Clothing Forecast Widget */}
-            <ClothingForecastWidget data={weatherData} />
+            <ClothingForecastWidget data={weatherData} preschoolMode={preschoolMode} />
 
             {/* Hourly Chart Widget */}
             <HourlyChartWidget data={weatherData} />

@@ -9,6 +9,7 @@ import {
 import { Search, MapPin, Loader2, Globe, Navigation } from 'lucide-react';
 import { GeocodingService, type CitySearchResult } from '@/services/geocoding/GeocodingService';
 import { GeolocationService } from '@/services/geolocation/GeolocationService';
+import { useLanguage } from '@/contexts/LanguageContext';
 import type { Location } from '@/types/location';
 
 interface CitySearchDialogProps {
@@ -22,6 +23,7 @@ export function CitySearchDialog({
   onOpenChange,
   onCitySelected,
 }: CitySearchDialogProps) {
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<CitySearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -87,10 +89,10 @@ export function CitySearchDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Globe className="w-5 h-5 text-[#ff6b00]" />
-            Choose a city
+            {t.location.chooseCity}
           </DialogTitle>
           <DialogDescription>
-            Search for a city or select one from the list.
+            {t.location.searchPlaceholder}
           </DialogDescription>
         </DialogHeader>
 
@@ -99,7 +101,7 @@ export function CitySearchDialog({
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#a8a8a8]" />
           <input
             type="text"
-            placeholder="Search for a city..."
+            placeholder={t.location.searchPlaceholder}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-2 bg-[#2a2a2a] border border-[#ff6b00]/20 rounded-md text-[#e5e7eb] placeholder:text-[#a8a8a8] focus:outline-none focus:ring-2 focus:ring-[#ff6b00]/50 focus:border-[#ff6b00]/50"
@@ -121,14 +123,14 @@ export function CitySearchDialog({
             <>
               <Loader2 className="w-4 h-4 text-[#ff6b00] animate-spin" />
               <span className="text-sm font-medium text-[#ff6b00]">
-                Detecting...
+                {t.location.detecting}
               </span>
             </>
           ) : (
             <>
               <Navigation className="w-4 h-4 text-[#ff6b00]" />
               <span className="text-sm font-medium text-[#ff6b00]">
-                Detect my location automatically
+                {t.location.detectLocation}
               </span>
             </>
           )}
@@ -146,7 +148,7 @@ export function CitySearchDialog({
           {!isSearching && searchResults.length > 0 && (
             <div className="space-y-1">
               <p className="text-xs text-[#a8a8a8] uppercase tracking-wider mb-2 px-2">
-                Search Results
+                {t.location.searchResults}
               </p>
               {searchResults.map((result, index) => (
                 <button
@@ -186,7 +188,7 @@ export function CitySearchDialog({
             <div className="flex flex-col items-center justify-center py-8 text-center">
               <Search className="w-12 h-12 text-[#a8a8a8] mb-3" />
               <p className="text-sm text-[#a8a8a8]">
-                No cities found for "{searchQuery}"
+                {t.location.noCitiesFound} "{searchQuery}"
               </p>
             </div>
           )}
@@ -195,7 +197,7 @@ export function CitySearchDialog({
           {showPopularCities && !isSearching && (
             <div className="space-y-1">
               <p className="text-xs text-[#a8a8a8] uppercase tracking-wider mb-2 px-2">
-                Popular Cities
+                {t.location.popularCities}
               </p>
               {popularCities.map((city) => (
                 <button

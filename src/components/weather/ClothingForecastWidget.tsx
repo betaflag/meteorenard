@@ -4,16 +4,17 @@ import { TimeBlockService } from '@/services/timeBlock/TimeBlockService';
 
 interface ClothingForecastWidgetProps {
   data: WeatherData | null;
+  preschoolMode?: boolean;
 }
 
-export function ClothingForecastWidget({ data }: ClothingForecastWidgetProps) {
+export function ClothingForecastWidget({ data, preschoolMode = false }: ClothingForecastWidgetProps) {
   // Don't render if no data
   if (!data) {
     return null;
   }
 
   // Get 3 time blocks with weather and clothing recommendations
-  const timeBlocks = TimeBlockService.getTimeBlocksWithWeather(data);
+  const timeBlocks = TimeBlockService.getTimeBlocksWithWeather(data, undefined, preschoolMode);
 
   return (
     <div className="w-full max-w-[1400px] mx-auto">

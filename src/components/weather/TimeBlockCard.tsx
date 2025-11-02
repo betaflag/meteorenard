@@ -3,6 +3,8 @@ import type { TimeBlockData } from '@/services/timeBlock/types';
 import { WeatherIcon } from './WeatherIcon';
 import { Droplets } from 'lucide-react';
 import { getClothingIcon } from '@/services/clothing/clothingIconMap';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { TimeBlockPeriod } from '@/services/timeBlock/types';
 
 // Import time block banner images
 import morningBanner from '@/assets/timeblocks/morning_banner.jpg';
@@ -14,12 +16,18 @@ interface TimeBlockCardProps {
   isHighlighted?: boolean;
 }
 
-// Get banner image based on time block label
-const getTimeBlockBanner = (label: string): string | undefined => {
-  if (label.includes('Morning') || label.includes('8am-12pm')) return morningBanner;
-  if (label.includes('Afternoon') || label.includes('12pm-5pm')) return afternoonBanner;
-  if (label.includes('Evening') || label.includes('6pm-10pm')) return eveningBanner;
-  return undefined;
+// Get banner image based on time block period
+const getTimeBlockBanner = (period: TimeBlockPeriod): string | undefined => {
+  switch (period) {
+    case TimeBlockPeriod.MORNING:
+      return morningBanner;
+    case TimeBlockPeriod.AFTERNOON:
+      return afternoonBanner;
+    case TimeBlockPeriod.EVENING:
+      return eveningBanner;
+    default:
+      return undefined;
+  }
 };
 
 // Dynamic import for clothing icons
@@ -32,8 +40,9 @@ const getClothingIconUrl = (iconFilename: string) => {
 };
 
 export function TimeBlockCard({ data, isHighlighted: _isHighlighted = false }: TimeBlockCardProps) {
+  const { t } = useLanguage();
   const {
-    label,
+    period,
     temperature,
     condition,
     precipitationProbability,
@@ -41,8 +50,54 @@ export function TimeBlockCard({ data, isHighlighted: _isHighlighted = false }: T
     isNextDay,
   } = data;
 
+  // Get translated label based on period
+  const getTranslatedLabel = () => {
+    switch (period) {
+      case TimeBlockPeriod.MORNING:
+        return t.timeBlocks.morning;
+      case TimeBlockPeriod.AFTERNOON:
+        return t.timeBlocks.afternoon;
+      case TimeBlockPeriod.EVENING:
+        return t.timeBlocks.evening;
+      default:
+        return '';
+    }
+  };
+
+  // Translate clothing item name based on its ID
+  const translateClothingItem = (itemId: string): string => {
+    const key = itemId.replace(/-/g, '') as keyof typeof t.clothing;
+    // Map IDs to translation keys
+    const idToKeyMap: Record<string, keyof typeof t.clothing> = {
+      'winter-hat': 'winterHat',
+      'neck-warmer': 'neckWarmer',
+      'mittens-gloves': 'mittensGloves',
+      'winter-coat': 'winterCoat',
+      'snow-pants': 'snowPants',
+      'winter-boots': 'winterBoots',
+      'thin-hat': 'lightHat',
+      'thin-gloves': 'lightGloves',
+      'mid-season-coat': 'midSeasonJacket',
+      'mid-season-pants': 'regularPants',
+      'rain-winter-boots': 'winterRainBoots',
+      'light-coat-vest': 'lightJacketVest',
+      'casual-pants': 'casualPants',
+      'outdoor-shoes': 'outdoorShoes',
+      'long-sleeve-shirt': 'lightLongSleeve',
+      'light-pants': 'lightPants',
+      'cap-hat': 'capHat',
+      'short-sleeve-shirt': 'shortSleeve',
+      'shorts-skirt': 'shortsSkirt',
+      'sunscreen': 'sunscreen',
+    };
+
+    const translationKey = idToKeyMap[itemId];
+    return translationKey ? t.clothing[translationKey] : itemId;
+  };
+
   const displayItems = clothingItems.slice(0, 4);
-  const bannerImage = getTimeBlockBanner(label);
+  const bannerImage = getTimeBlockBanner(period);
+  const translatedLabel = getTranslatedLabel();
 
   return (
     <Card
@@ -74,10 +129,10 @@ export function TimeBlockCard({ data, isHighlighted: _isHighlighted = false }: T
           {/* Time label and next day indicator */}
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-[#ff6b00] font-raleway font-semibold text-sm sm:text-base">
-              {label}
+              {translatedLabel}
             </h3>
             {isNextDay && (
-              <span className="text-[#a8a8a8] text-xs font-raleway italic bg-[#1a1a2e]/80 px-2 py-1 rounded backdrop-blur-sm">Tomorrow</span>
+              <span className="text-[#a8a8a8] text-xs font-raleway italic bg-[#1a1a2e]/80 px-2 py-1 rounded backdrop-blur-sm">{t.timeBlocks.tomorrow}</span>
             )}
           </div>
 
@@ -128,7 +183,7 @@ export function TimeBlockCard({ data, isHighlighted: _isHighlighted = false }: T
                   <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-[#ff6b00]/20 flex-shrink-0" />
                 )}
                 <span className="text-[#e5e7eb] text-xs sm:text-sm font-raleway">
-                  {item.name}
+                  {translateClothingItem(item.id)}
                 </span>
               </div>
             );

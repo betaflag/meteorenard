@@ -6,13 +6,25 @@ import { CLOTHING_RECOMMENDATIONS } from './clothingData';
  */
 export class ClothingRecommendationService {
   /**
+   * Temperature adjustment for preschool mode (2-5 years old)
+   * Subtracting 5°C makes recommendations more conservative/warmer
+   */
+  private static readonly PRESCHOOL_TEMPERATURE_ADJUSTMENT = -5;
+
+  /**
    * Get clothing recommendations based on temperature
    * @param temperature - Temperature in Celsius (can be actual or feels-like)
+   * @param preschoolMode - If true, adjusts recommendations for children aged 2-5 years
    * @returns Array of recommended clothing items
    */
-  static getRecommendations(temperature: number): ClothingItem[] {
+  static getRecommendations(temperature: number, preschoolMode: boolean = false): ClothingItem[] {
+    // Apply temperature adjustment for preschool mode
+    const adjustedTemperature = preschoolMode
+      ? temperature + this.PRESCHOOL_TEMPERATURE_ADJUSTMENT
+      : temperature;
+
     // Find the appropriate temperature range
-    const recommendation = this.findRecommendationForTemperature(temperature);
+    const recommendation = this.findRecommendationForTemperature(adjustedTemperature);
 
     if (!recommendation) {
       // Fallback to mild weather clothing if somehow no match found
@@ -25,10 +37,14 @@ export class ClothingRecommendationService {
   /**
    * Get the full recommendation object including temperature range info
    * @param temperature - Temperature in Celsius
+   * @param preschoolMode - If true, adjusts recommendations for children aged 2-5 years
    * @returns Full ClothingRecommendation object or null
    */
-  static getFullRecommendation(temperature: number): ClothingRecommendation | null {
-    return this.findRecommendationForTemperature(temperature);
+  static getFullRecommendation(temperature: number, preschoolMode: boolean = false): ClothingRecommendation | null {
+    const adjustedTemperature = preschoolMode
+      ? temperature + this.PRESCHOOL_TEMPERATURE_ADJUSTMENT
+      : temperature;
+    return this.findRecommendationForTemperature(adjustedTemperature);
   }
 
   /**
@@ -55,13 +71,15 @@ export class ClothingRecommendationService {
    * Get clothing items by category for a given temperature
    * @param temperature - Temperature in Celsius
    * @param category - Specific clothing category to filter by
+   * @param preschoolMode - If true, adjusts recommendations for children aged 2-5 years
    * @returns Array of clothing items in that category
    */
   static getRecommendationsByCategory(
     temperature: number,
-    category: ClothingItem['category']
+    category: ClothingItem['category'],
+    preschoolMode: boolean = false
   ): ClothingItem[] {
-    const recommendations = this.getRecommendations(temperature);
+    const recommendations = this.getRecommendations(temperature, preschoolMode);
     return recommendations.filter((item) => item.category === category);
   }
 

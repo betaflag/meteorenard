@@ -1,8 +1,10 @@
 import { SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Switch } from '@/components/ui/switch';
 import { ProviderToggle } from '@/components/weather/ProviderToggle';
 import { LocationSelector } from '@/components/location/LocationSelector';
 import { LanguageSwitcher } from '@/components/settings/LanguageSwitcher';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Baby } from 'lucide-react';
 import type { WeatherProvider } from '@/config/weather.config';
 import type { Location } from '@/types/location';
 import renardLogo from '@/assets/renard.png';
@@ -15,6 +17,8 @@ interface AppMenuProps {
   onLocationChange: (location: Location) => void;
   onLocationAdd: (location: Location) => void;
   onLocationRemove: (locationName: string) => void;
+  preschoolMode: boolean;
+  onPreschoolModeChange: (enabled: boolean) => void;
 }
 
 export function AppMenu({
@@ -25,6 +29,8 @@ export function AppMenu({
   onLocationChange,
   onLocationAdd,
   onLocationRemove,
+  preschoolMode,
+  onPreschoolModeChange,
 }: AppMenuProps) {
   const { t } = useLanguage();
 
@@ -72,6 +78,33 @@ export function AppMenu({
               activeProvider={activeProvider}
               onProviderChange={onProviderChange}
             />
+          </div>
+
+          {/* Divider */}
+          <div className="border-t border-[#ff6b00]/10" />
+
+          {/* Preschool Mode Section */}
+          <div>
+            <h3 className="text-sm font-semibold text-[#e5e7eb] uppercase tracking-wider mb-3">
+              Recommandations vestimentaires
+            </h3>
+            <div className="flex items-center justify-between p-3 rounded-lg bg-[#2a2a3a]/50 border border-[#ff6b00]/10">
+              <div className="flex items-center gap-3">
+                <Baby className="w-5 h-5 text-[#ff6b00]" />
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium text-[#e5e7eb]">
+                    Mode Préscolaire (2-5 ans)
+                  </span>
+                  <span className="text-xs text-[#a8a8a8]">
+                    Recommandations plus chaudes pour les enfants
+                  </span>
+                </div>
+              </div>
+              <Switch
+                checked={preschoolMode}
+                onCheckedChange={onPreschoolModeChange}
+              />
+            </div>
           </div>
 
           {/* Divider */}
