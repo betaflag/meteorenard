@@ -1,0 +1,15 @@
+# robots.txt for Météo Renard
+# https://meteorenard.com/
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://meteorenard.com/sitemap.xml
+
+# Block specific paths if needed (none currently)
+# Disallow: /admin/
+# Disallow: /api/
+
+# Crawl delay (optional, adjust if needed)
+# Crawl-delay: 1

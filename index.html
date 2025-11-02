@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Primary Meta Tags -->
+    <title>Météo Renard - Weather Forecast for Montreal</title>
+    <meta name="title" content="Météo Renard - Weather Forecast for Montreal" />
+    <meta name="description" content="Weather application for Montreal with hourly forecasts, smart clothing recommendations, and data from reliable sources. Modern and easy-to-use interface." />
+    <meta name="keywords" content="weather, Montreal, forecast, temperature, clothing, recommendations, Quebec, Canada" />
+    <meta name="author" content="Météo Renard" />
+    <meta name="language" content="English" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://meteorenard.com/" />
+    <meta property="og:title" content="Météo Renard - Weather Forecast for Montreal" />
+    <meta property="og:description" content="Weather application for Montreal with hourly forecasts, smart clothing recommendations, and data from reliable sources." />
+    <meta property="og:image" content="https://meteorenard.com/og-image.jpg" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:site_name" content="Météo Renard" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://meteorenard.com/" />
+    <meta property="twitter:title" content="Météo Renard - Weather Forecast for Montreal" />
+    <meta property="twitter:description" content="Weather application for Montreal with hourly forecasts, smart clothing recommendations, and data from reliable sources." />
+    <meta property="twitter:image" content="https://meteorenard.com/og-image.jpg" />
+
+    <!-- Additional Meta Tags -->
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#ff6b00" />
+    <link rel="canonical" href="https://meteorenard.com/" />
+
+    <!-- Geographic Targeting -->
+    <meta name="geo.region" content="CA-QC" />
+    <meta name="geo.placename" content="Montréal" />
+    <meta name="geo.position" content="45.5017;-73.5673" />
+    <meta name="ICBM" content="45.5017, -73.5673" />
+
+    <!-- Mobile Web App -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Météo Renard" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="Météo Renard" />
+
+    <!-- Performance Hints -->
+    <link rel="dns-prefetch" href="https://geo.weather.gc.ca" />
+    <link rel="dns-prefetch" href="https://dd.weather.gc.ca" />
+    <link rel="dns-prefetch" href="https://api.open-meteo.com" />
+    <link rel="preconnect" href="https://geo.weather.gc.ca" crossorigin />
+    <link rel="preconnect" href="https://dd.weather.gc.ca" crossorigin />
+    <link rel="preconnect" href="https://api.open-meteo.com" crossorigin />
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Météo Renard",
+      "description": "Weather application for Montreal with hourly forecasts, smart clothing recommendations, and data from reliable sources.",
+      "url": "https://meteorenard.com/",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Web Browser",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "CAD"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "Météo Renard"
+      },
+      "inLanguage": "en-US",
+      "keywords": "weather, Montreal, forecast, temperature, clothing, recommendations",
+      "image": "https://meteorenard.com/og-image.jpg",
+      "screenshot": "https://meteorenard.com/og-image.jpg"
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "Météo Renard",
+      "description": "Weather forecast service for Montreal",
+      "url": "https://meteorenard.com/",
+      "logo": "https://meteorenard.com/apple-touch-icon.png",
+      "image": "https://meteorenard.com/og-image.jpg",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Montreal",
+        "addressRegion": "QC",
+        "addressCountry": "CA"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "45.5017",
+        "longitude": "-73.5673"
+      },
+      "areaServed": {
+        "@type": "City",
+        "name": "Montreal"
+      }
+    }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
