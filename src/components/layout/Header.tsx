@@ -13,6 +13,8 @@ interface HeaderProps {
   onLocationChange: (location: Location) => void;
   onLocationAdd: (location: Location) => void;
   onLocationRemove: (locationName: string) => void;
+  preschoolMode: boolean;
+  onPreschoolModeChange: (enabled: boolean) => void;
 }
 
 export function Header({
@@ -23,6 +25,8 @@ export function Header({
   onLocationChange,
   onLocationAdd,
   onLocationRemove,
+  preschoolMode,
+  onPreschoolModeChange,
 }: HeaderProps) {
   return (
     <header
@@ -56,6 +60,8 @@ export function Header({
               onLocationChange={onLocationChange}
               onLocationAdd={onLocationAdd}
               onLocationRemove={onLocationRemove}
+              preschoolMode={preschoolMode}
+              onPreschoolModeChange={onPreschoolModeChange}
             />
           </SheetContent>
         </Sheet>
