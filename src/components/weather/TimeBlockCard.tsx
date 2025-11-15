@@ -66,7 +66,6 @@ export function TimeBlockCard({ data, isHighlighted: _isHighlighted = false }: T
 
   // Translate clothing item name based on its ID
   const translateClothingItem = (itemId: string): string => {
-    const key = itemId.replace(/-/g, '') as keyof typeof t.clothing;
     // Map IDs to translation keys
     const idToKeyMap: Record<string, keyof typeof t.clothing> = {
       'winter-hat': 'winterHat',

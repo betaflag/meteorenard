@@ -24,12 +24,19 @@ export function LanguageSwitcher() {
 
   const currentLanguage = languages.find((l) => l.value === language);
 
+  // Wrapper function to handle type conversion from string to Language
+  const handleLanguageChange = (value: string) => {
+    if (value === 'en' || value === 'fr') {
+      setLanguage(value);
+    }
+  };
+
   return (
     <div>
       <h3 className="text-sm font-semibold text-[#e5e7eb] uppercase tracking-wider mb-3">
         {t.appMenu.language}
       </h3>
-      <Select value={language} onValueChange={setLanguage}>
+      <Select value={language} onValueChange={handleLanguageChange}>
         <SelectTrigger
           className="w-full h-auto rounded-md transition-all duration-200 font-raleway text-left border-[#ff6b00]/20 hover:border-[#ff6b00]/40 hover:bg-[#ff6b00]/5 focus:ring-[#ff6b00]/30 focus:border-[#ff6b00]/50 [&>svg]:hidden"
           style={{
