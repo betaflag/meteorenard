@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ClockDisplay } from '@/components/clock/ClockDisplay';
 import { ClockTimeBlockCard } from '@/components/clock/ClockTimeBlockCard';
+import { WeatherEffects } from '@/components/clock/WeatherEffects';
 import { LocationPermissionDialog } from '@/components/location/LocationPermissionDialog';
 import { CitySearchDialog } from '@/components/location/CitySearchDialog';
 import { TimeBlockService } from '@/services/timeBlock/TimeBlockService';
@@ -49,6 +50,7 @@ export function ClockPage() {
   const [backgroundImage, setBackgroundImage] = useState<string>(() => getRandomBackground());
   const [showLocationPermissionDialog, setShowLocationPermissionDialog] = useState(false);
   const [showCitySearchDialog, setShowCitySearchDialog] = useState(false);
+  const [forcedWeatherEffect, setForcedWeatherEffect] = useState<'rain' | 'snow' | null>(null);
 
   const fetchWeatherData = useCallback(async (location: Location) => {
     try {
@@ -125,8 +127,28 @@ export function ClockPage() {
     ? TimeBlockService.getTimeBlocksWithWeather(weatherData, undefined, false)
     : [];
 
+  // Get the next time block's weather condition for effects
+  const nextBlockCondition = timeBlocks.length > 0 ? timeBlocks[0].condition : null;
+
+  // Handle clicking a time block to test weather effects
+  const handleTimeBlockClick = useCallback((block: typeof timeBlocks[0]) => {
+    // If block has snow accumulation, show snow effect
+    if (block.snowAccumulation && block.snowAccumulation > 0) {
+      setForcedWeatherEffect(prev => prev === 'snow' ? null : 'snow');
+    }
+    // If block has precipitation probability, show rain effect
+    else if (block.precipitationProbability && block.precipitationProbability > 0) {
+      setForcedWeatherEffect(prev => prev === 'rain' ? null : 'rain');
+    }
+  }, []);
+
   // Handle tap/click to change background
-  const handleBackgroundChange = () => {
+  const handleBackgroundChange = (e: React.MouseEvent) => {
+    // Don't change background if clicking on a time block card
+    const target = e.target as HTMLElement;
+    if (target.closest('[data-timeblock-card]')) {
+      return;
+    }
     setBackgroundImage(prevBackground => getRandomBackground(prevBackground));
   };
 
@@ -148,6 +170,11 @@ export function ClockPage() {
           background: 'linear-gradient(to bottom, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.7) 100%)',
         }}
       />
+
+      {/* Weather effects (rain/snow) */}
+      {(forcedWeatherEffect || nextBlockCondition) && (
+        <WeatherEffects condition={(forcedWeatherEffect || nextBlockCondition)!} />
+      )}
 
       {/* Main Layout Container - Optimized for 1920x1200 */}
       <div
@@ -193,8 +220,17 @@ export function ClockPage() {
               {timeBlocks.slice(0, 3).map((block, index) => (
                 <div
                   key={`${block.period}-${index}`}
+                  data-timeblock-card
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleTimeBlockClick(block);
+                  }}
                   style={{
                     height: '280px', // Fixed height for consistency
+                    cursor: (block.snowAccumulation && block.snowAccumulation > 0) ||
+                            (block.precipitationProbability && block.precipitationProbability > 0)
+                      ? 'pointer'
+                      : 'default',
                   }}
                 >
                   <ClockTimeBlockCard data={block} />
