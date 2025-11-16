@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { WeatherHero } from './components/weather/WeatherHero';
 import { HourlyChartWidget } from './components/weather/HourlyChartWidget';
@@ -6,6 +7,7 @@ import { DailyForecastWidget } from './components/weather/DailyForecastWidget';
 import { ClothingForecastWidget } from './components/weather/ClothingForecastWidget';
 import { LocationPermissionDialog } from './components/location/LocationPermissionDialog';
 import { CitySearchDialog } from './components/location/CitySearchDialog';
+import { ClockPage } from './pages/ClockPage';
 import { WeatherServiceFactory } from './services/weather/WeatherServiceFactory';
 import { LocationStorageService } from './services/location/LocationStorageService';
 import { PreferencesStorageService } from './services/preferences/PreferencesStorageService';
@@ -229,9 +231,14 @@ function AppContent() {
 
 function App() {
   return (
-    <LanguageProvider>
-      <AppContent />
-    </LanguageProvider>
+    <BrowserRouter>
+      <LanguageProvider>
+        <Routes>
+          <Route path="/" element={<AppContent />} />
+          <Route path="/clock" element={<ClockPage />} />
+        </Routes>
+      </LanguageProvider>
+    </BrowserRouter>
   );
 }
 
