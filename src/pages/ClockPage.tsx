@@ -7,7 +7,6 @@ import { CitySearchDialog } from '@/components/location/CitySearchDialog';
 import { TimeBlockService } from '@/services/timeBlock/TimeBlockService';
 import { WeatherServiceFactory } from '@/services/weather/WeatherServiceFactory';
 import { LocationStorageService } from '@/services/location/LocationStorageService';
-import { weatherConfig } from '@/config/weather.config';
 import type { WeatherData } from '@/types/weather';
 import type { Location } from '@/types/location';
 
@@ -102,25 +101,18 @@ export function ClockPage() {
     // Fetch weather data on mount
     fetchWeatherData(currentLocation);
 
-    // Set up periodic refresh every 10 minutes
-    const intervalId = setInterval(
-      () => fetchWeatherData(currentLocation),
-      weatherConfig.refreshInterval
-    );
+    // Unified refresh: both background and weather every 5 minutes
+    const REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes in milliseconds
+    const intervalId = setInterval(() => {
+      // Refresh weather data
+      fetchWeatherData(currentLocation);
+      // Rotate background
+      setBackgroundImage(prevBackground => getRandomBackground(prevBackground));
+    }, REFRESH_INTERVAL);
 
     // Cleanup on unmount
     return () => clearInterval(intervalId);
   }, [currentLocation, fetchWeatherData]);
-
-  // Auto-rotate background every 5 minutes
-  useEffect(() => {
-    const backgroundIntervalId = setInterval(() => {
-      setBackgroundImage(prevBackground => getRandomBackground(prevBackground));
-    }, 5 * 60 * 1000); // 5 minutes in milliseconds
-
-    // Cleanup on unmount
-    return () => clearInterval(backgroundIntervalId);
-  }, []);
 
   // Get time blocks with weather data
   const timeBlocks = weatherData
