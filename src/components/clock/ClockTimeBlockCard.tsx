@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import type { TimeBlockData } from '@/services/timeBlock/types';
 import { WeatherIcon } from '@/components/weather/WeatherIcon';
