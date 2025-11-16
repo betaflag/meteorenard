@@ -1,7 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import type { TimeBlockData } from '@/services/timeBlock/types';
 import { WeatherIcon } from '@/components/weather/WeatherIcon';
-import { Droplets } from 'lucide-react';
+import { Droplets, Snowflake } from 'lucide-react';
 import { getClothingIcon } from '@/services/clothing/clothingIconMap';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { TimeBlockPeriod } from '@/services/timeBlock/types';
@@ -27,6 +27,7 @@ export function ClockTimeBlockCard({ data }: ClockTimeBlockCardProps) {
     temperature,
     condition,
     precipitationProbability,
+    snowAccumulation,
     clothingItems,
     isNextDay,
   } = data;
@@ -138,11 +139,19 @@ export function ClockTimeBlockCard({ data }: ClockTimeBlockCardProps) {
               >
                 {Math.round(temperature)}°
               </span>
-              {precipitationProbability !== undefined && precipitationProbability > 0 && (
+              {/* Show snow accumulation if condition is snow, otherwise show precipitation probability */}
+              {condition === 'snow' && snowAccumulation !== undefined && snowAccumulation > 0 ? (
                 <div className="flex items-center text-[#4fc3f7] mt-1" style={{ gap: '4px', fontSize: '1rem' }}>
-                  <Droplets size={16} />
-                  <span>{precipitationProbability}%</span>
+                  <Snowflake size={16} />
+                  <span>{snowAccumulation.toFixed(1)} cm</span>
                 </div>
+              ) : (
+                precipitationProbability !== undefined && precipitationProbability > 0 && (
+                  <div className="flex items-center text-[#4fc3f7] mt-1" style={{ gap: '4px', fontSize: '1rem' }}>
+                    <Droplets size={16} />
+                    <span>{precipitationProbability}%</span>
+                  </div>
+                )
               )}
             </div>
           </div>

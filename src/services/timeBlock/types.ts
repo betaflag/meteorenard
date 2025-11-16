@@ -33,6 +33,7 @@ export interface TimeBlockData {
   temperature: number; // Temperature at start of block
   condition: WeatherCondition;
   precipitationProbability?: number;
+  snowAccumulation?: number; // Snow accumulation in cm
   clothingItems: ClothingItem[]; // Recommended clothing
   isNextDay: boolean; // Whether this block is for tomorrow
 }

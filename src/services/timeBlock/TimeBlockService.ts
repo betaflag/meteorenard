@@ -125,7 +125,7 @@ export class TimeBlockService {
     hourlyData: HourlyWeather[],
     startHour: number,
     endHour: number
-  ): { temp: number; condition: WeatherCondition; precipitationProbability?: number } | null {
+  ): { temp: number; condition: WeatherCondition; precipitationProbability?: number; snowAccumulation?: number } | null {
     const relevantData: HourlyWeather[] = [];
 
     for (const hourly of hourlyData) {
@@ -153,10 +153,24 @@ export class TimeBlockService {
       ? precipVals.reduce((sum, p) => sum + p, 0) / precipVals.length
       : undefined;
 
+    // Calculate total snow accumulation if condition is snow
+    let snowAccumulation: number | undefined;
+    if (condition === 'snow') {
+      const snowVals = relevantData
+        .map(h => h.precipitation)
+        .filter((p): p is number => p !== undefined && p > 0);
+      if (snowVals.length > 0) {
+        // Sum precipitation (in mm) and convert to cm
+        const totalSnowMm = snowVals.reduce((sum, p) => sum + p, 0);
+        snowAccumulation = totalSnowMm / 10; // Convert mm to cm
+      }
+    }
+
     return {
       temp: avgTemp,
       condition,
       precipitationProbability,
+      snowAccumulation,
     };
   }
 
@@ -187,11 +201,13 @@ export class TimeBlockService {
     let temperature: number;
     let condition: WeatherCondition;
     let precipitationProbability: number | undefined;
+    let snowAccumulation: number | undefined;
 
     if (avgWeather) {
       temperature = avgWeather.temp;
       condition = avgWeather.condition;
       precipitationProbability = avgWeather.precipitationProbability;
+      snowAccumulation = avgWeather.snowAccumulation;
     } else {
       // Fallback to looking for start hour specifically
       const weatherAtStart = this.findHourlyDataForHour(hourlyData, config.startHour);
@@ -239,6 +255,7 @@ export class TimeBlockService {
       temperature,
       condition,
       precipitationProbability,
+      snowAccumulation,
       clothingItems,
       isNextDay,
     };
