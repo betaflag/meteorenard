@@ -28,20 +28,32 @@ export function ClockTimeBlockCard({ data }: ClockTimeBlockCardProps) {
     condition,
     precipitationProbability,
     clothingItems,
+    isNextDay,
   } = data;
 
-  // Get simplified label (just period name, no time range)
+  // Get simplified label (just period name, with "Tomorrow" prefix if next day)
   const getTranslatedLabel = () => {
+    let periodName = '';
     switch (period) {
       case TimeBlockPeriod.MORNING:
-        return t.timeBlocks.morning.split(' ')[0]; // Just "Morning"
+        periodName = t.timeBlocks.morning.split(' ')[0]; // Just "Morning" or "Matin"
+        break;
       case TimeBlockPeriod.AFTERNOON:
-        return t.timeBlocks.afternoon.split(' ')[0]; // Just "Afternoon"
+        periodName = t.timeBlocks.afternoon.split(' ')[0]; // Just "Afternoon" or "Après-midi"
+        break;
       case TimeBlockPeriod.EVENING:
-        return t.timeBlocks.evening.split(' ')[0]; // Just "Evening"
+        periodName = t.timeBlocks.evening.split(' ')[0]; // Just "Evening" or "Soirée"
+        break;
       default:
         return '';
     }
+
+    // Prefix with "Tomorrow" / "Demain" if this is for the next day
+    if (isNextDay) {
+      return `${t.timeBlocks.tomorrow} ${periodName.toLowerCase()}`;
+    }
+
+    return periodName;
   };
 
   // Translate clothing item name based on its ID
