@@ -10,35 +10,62 @@ import { LocationStorageService } from '@/services/location/LocationStorageServi
 import type { WeatherData } from '@/types/weather';
 import type { Location } from '@/types/location';
 
-// Array of available steampunk backgrounds
-const BACKGROUNDS = [
-  '/backgrounds/steampunk-clock-bg.png',
-  '/backgrounds/steampunk-clock-bg-1.png',
-  '/backgrounds/steampunk-clock-bg-2.png',
-  '/backgrounds/steampunk-clock-bg-3.png',
-  '/backgrounds/steampunk-clock-bg-4.png',
-  '/backgrounds/steampunk-clock-bg-5.png',
-  '/backgrounds/steampunk-clock-bg-winter-1.png',
-  '/backgrounds/steampunk-clock-bg-winter-2.png',
-  '/backgrounds/steampunk-clock-bg-winter-3.png',
-  '/backgrounds/steampunk-clock-bg-winter-4.png',
-  '/backgrounds/steampunk-clock-bg-winter-5.png',
-  '/backgrounds/steampunk-winter-cinematic-1.png',
-  '/backgrounds/steampunk-winter-cinematic-2.png',
-  '/backgrounds/steampunk-winter-cinematic-3.png',
-  '/backgrounds/steampunk-winter-cinematic-4.png',
-  '/backgrounds/steampunk-winter-cinematic-5.png',
-];
+// Time-based background arrays
+const BACKGROUNDS = {
+  morning: [
+    '/backgrounds/time-based/morning/morning-1.jpg',
+    '/backgrounds/time-based/morning/morning-2.jpg',
+    '/backgrounds/time-based/morning/morning-3.jpg',
+    '/backgrounds/time-based/morning/morning-4.jpg',
+    '/backgrounds/time-based/morning/morning-5.jpg',
+  ],
+  afternoon: [
+    '/backgrounds/time-based/afternoon/afternoon-1.jpg',
+    '/backgrounds/time-based/afternoon/afternoon-2.jpg',
+    '/backgrounds/time-based/afternoon/afternoon-3.jpg',
+    '/backgrounds/time-based/afternoon/afternoon-4.jpg',
+    '/backgrounds/time-based/afternoon/afternoon-5.jpg',
+  ],
+  evening: [
+    '/backgrounds/time-based/evening/evening-1.jpg',
+    '/backgrounds/time-based/evening/evening-2.jpg',
+    '/backgrounds/time-based/evening/evening-3.jpg',
+    '/backgrounds/time-based/evening/evening-4.jpg',
+    '/backgrounds/time-based/evening/evening-5.jpg',
+  ],
+  night: [
+    '/backgrounds/time-based/night/night-1.jpg',
+    '/backgrounds/time-based/night/night-2.jpg',
+    '/backgrounds/time-based/night/night-3.jpg',
+    '/backgrounds/time-based/night/night-4.jpg',
+    '/backgrounds/time-based/night/night-5.jpg',
+  ],
+};
 
-// Select a random background, optionally excluding the current one
+type TimePeriod = keyof typeof BACKGROUNDS;
+
+// Get current time period based on hour
+const getCurrentTimePeriod = (): TimePeriod => {
+  const hour = new Date().getHours();
+  if (hour >= 5 && hour < 11) return 'morning';
+  if (hour >= 11 && hour < 17) return 'afternoon';
+  if (hour >= 17 && hour < 21) return 'evening';
+  return 'night'; // 21-5
+};
+
+// Select a random background for current time period, optionally excluding the current one
 const getRandomBackground = (excludeCurrent?: string) => {
-  if (excludeCurrent && BACKGROUNDS.length > 1) {
-    const availableBackgrounds = BACKGROUNDS.filter(bg => bg !== excludeCurrent);
+  const period = getCurrentTimePeriod();
+  const periodBackgrounds = BACKGROUNDS[period];
+
+  if (excludeCurrent && periodBackgrounds.length > 1) {
+    const availableBackgrounds = periodBackgrounds.filter(bg => bg !== excludeCurrent);
     const randomIndex = Math.floor(Math.random() * availableBackgrounds.length);
     return availableBackgrounds[randomIndex];
   }
-  const randomIndex = Math.floor(Math.random() * BACKGROUNDS.length);
-  return BACKGROUNDS[randomIndex];
+
+  const randomIndex = Math.floor(Math.random() * periodBackgrounds.length);
+  return periodBackgrounds[randomIndex];
 };
 
 export function ClockPage() {
