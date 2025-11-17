@@ -4,7 +4,8 @@ import { ProviderToggle } from '@/components/weather/ProviderToggle';
 import { LocationSelector } from '@/components/location/LocationSelector';
 import { LanguageSwitcher } from '@/components/settings/LanguageSwitcher';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Baby } from 'lucide-react';
+import { Baby, Clock } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import type { WeatherProvider } from '@/config/weather.config';
 import type { Location } from '@/types/location';
 import renardLogo from '@/assets/renard.png';
@@ -53,6 +54,18 @@ export function AppMenu({
           </SheetTitle>
         </div>
       </SheetHeader>
+
+      {/* Clock Page Link */}
+      <div className="px-6 pt-4">
+        <Link to="/clock" className="block">
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-[#2a2a3a]/50 border border-[#ff6b00]/10 hover:bg-[#2a2a3a]/70 hover:border-[#ff6b00]/30 transition-all">
+            <Clock className="w-5 h-5 text-[#ff6b00]" />
+            <span className="text-sm font-medium text-[#e5e7eb]">
+              {t.appMenu.clockPage}
+            </span>
+          </div>
+        </Link>
+      </div>
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto px-6 py-6">

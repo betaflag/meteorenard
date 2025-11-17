@@ -7,6 +7,7 @@ const en: Translations = {
     noSavedCities: 'No saved cities',
     weatherProvider: 'Weather Provider',
     language: 'Language',
+    clockPage: 'Clock',
   },
 
   location: {
@@ -111,6 +112,7 @@ const fr: Translations = {
     noSavedCities: 'Aucune ville sauvegardée',
     weatherProvider: 'Fournisseur météo',
     language: 'Langue',
+    clockPage: 'Horloge',
   },
 
   location: {

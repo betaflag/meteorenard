@@ -8,6 +8,7 @@ export interface Translations {
     noSavedCities: string;
     weatherProvider: string;
     language: string;
+    clockPage: string;
   };
 
   // Location
