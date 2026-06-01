@@ -84,7 +84,9 @@ export function adaptOpenMeteoResponse(
   const currentWeatherCode = response.current_weather.weathercode;
   const currentTemp = Math.round(response.current_weather.temperature);
 
-  // Get next 24 hours of forecast for chart, and 8 hours for widget
+  // Keep 48 hours of forecast so the clock page's time blocks (which can reach
+  // tomorrow evening) always have real hourly data. The chart and hourly widget
+  // slice down to the window they display.
   const now = new Date();
   const hourlyDataFull = response.hourly.time
     .map((time, index) => ({
@@ -99,9 +101,9 @@ export function adaptOpenMeteoResponse(
     }))
     .filter((hour) => new Date(hour.time) >= now);
 
-  // Take first 24 hours for the hourly forecast widget
-  const hourlyData = hourlyDataFull.slice(0, 24).map((hour) => ({
+  const hourlyData = hourlyDataFull.slice(0, 48).map((hour) => ({
     time: formatTime(hour.time),
+    isoTime: hour.time,
     temp: hour.temp,
     condition: mapWeatherCode(hour.weathercode),
     feelsLike: hour.feelsLike,

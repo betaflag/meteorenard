@@ -130,11 +130,13 @@ export function adaptMSCGeoMetResponse(
   // Current weather - condition is an object with en/fr properties
   const currentCondition = mapConditionToWeatherCondition(current.condition.en);
 
-  // Hourly forecast (take up to 24 hours)
+  // Hourly forecast (take up to 48 hours so clock-page time blocks reaching
+  // tomorrow evening have real hourly data; API may return fewer)
   const hourly = props.hourlyForecastGroup.hourlyForecasts
-    .slice(0, 24)
+    .slice(0, 48)
     .map((hour) => ({
       time: formatTime(hour.timestamp),
+      isoTime: hour.timestamp,
       temp: Math.round(hour.temperature.value.en),
       condition: mapConditionToWeatherCondition(hour.condition.en),
       feelsLike: undefined, // Not available in EC API

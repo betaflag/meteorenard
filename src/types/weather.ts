@@ -9,7 +9,8 @@ export type WeatherCondition =
   | 'fog';
 
 export interface HourlyWeather {
-  time: string;
+  time: string; // Display label in 12-hour format (e.g., "10PM")
+  isoTime: string; // Absolute timestamp for date-aware matching
   temp: number;
   condition: WeatherCondition;
   feelsLike?: number;

@@ -37,7 +37,7 @@ export function HourlyChartWidget({ data }: HourlyChartWidgetProps) {
       />
 
       <CardContent className="relative z-10 pt-3 px-3 pb-0 sm:pt-6 sm:px-6 sm:pb-0 md:pt-6 md:px-8 md:pb-0 lg:pt-6 lg:px-10 lg:pb-0">
-        <HourlyChart data={data.hourly} />
+        <HourlyChart data={data.hourly.slice(0, 24)} />
       </CardContent>
     </Card>
   );

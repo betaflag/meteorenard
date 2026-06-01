@@ -28,141 +28,119 @@ const TIME_BLOCKS: TimeBlockConfig[] = [
 ];
 
 /**
+ * A time block anchored to a concrete calendar date.
+ */
+interface TimeBlockInstance {
+  config: TimeBlockConfig;
+  start: Date;
+  end: Date;
+  isNextDay: boolean;
+}
+
+/**
  * Service for managing time blocks and weather-based clothing recommendations
  */
 export class TimeBlockService {
   /**
-   * Get the current time block based on current hour
-   * @param currentHour - Current hour in 24-hour format (0-23)
-   * @returns Index of current time block, or 0 if outside blocks
-   */
-  static getCurrentTimeBlockIndex(currentHour: number): number {
-    for (let i = 0; i < TIME_BLOCKS.length; i++) {
-      const block = TIME_BLOCKS[i];
-      if (currentHour >= block.startHour && currentHour < block.endHour) {
-        return i;
-      }
-    }
-    // Outside all blocks (22:00-8:00), return first block for next day
-    return 0;
-  }
-
-  /**
-   * Get the next N time blocks starting from current time
+   * Build the next `count` time blocks as concrete date ranges starting from `now`.
+   *
+   * A block is included if it has not fully ended yet, so the block currently in
+   * progress is kept. Blocks are generated chronologically across today and the
+   * following days, which avoids the gaps that a fixed-index approach has at
+   * 17:00 and overnight (22:00-08:00).
+   *
+   * @param now - Reference time
    * @param count - Number of blocks to return
-   * @param currentHour - Current hour (defaults to now)
-   * @returns Array of time block configurations
+   * @returns Concrete, chronologically ordered block instances
    */
-  static getNextTimeBlocks(
-    count: number = 3,
-    currentHour?: number
-  ): Array<{ config: TimeBlockConfig; isNextDay: boolean }> {
-    const now = currentHour ?? new Date().getHours();
-    const currentIndex = this.getCurrentTimeBlockIndex(now);
-    const result: Array<{ config: TimeBlockConfig; isNextDay: boolean }> = [];
+  private static getUpcomingBlockInstances(now: Date, count: number): TimeBlockInstance[] {
+    const today = new Date(now);
+    today.setHours(0, 0, 0, 0);
+    const todayMs = today.getTime();
 
-    for (let i = 0; i < count; i++) {
-      const blockIndex = (currentIndex + i) % TIME_BLOCKS.length;
-      const isNextDay = currentIndex + i >= TIME_BLOCKS.length;
+    const instances: TimeBlockInstance[] = [];
 
-      result.push({
-        config: TIME_BLOCKS[blockIndex],
-        isNextDay,
-      });
-    }
+    for (let dayOffset = 0; instances.length < count && dayOffset < 4; dayOffset++) {
+      for (const config of TIME_BLOCKS) {
+        const start = new Date(today);
+        start.setDate(today.getDate() + dayOffset);
+        start.setHours(config.startHour, 0, 0, 0);
 
-    return result;
-  }
+        const end = new Date(start);
+        end.setHours(config.endHour, 0, 0, 0);
 
-  /**
-   * Parse time string (e.g., "10PM", "8AM") to 24-hour format
-   * @param timeString - Time in format like "10PM", "8AM"
-   * @returns Hour in 24-hour format (0-23)
-   */
-  private static parseTimeString(timeString: string): number {
-    const match = timeString.match(/(\d+)(AM|PM)/i);
-    if (!match) return -1;
+        if (end.getTime() <= now.getTime()) {
+          continue; // Block already over
+        }
 
-    let hour = parseInt(match[1], 10);
-    const period = match[2].toUpperCase();
+        const blockDay = new Date(start);
+        blockDay.setHours(0, 0, 0, 0);
 
-    if (period === 'PM' && hour !== 12) {
-      hour += 12;
-    } else if (period === 'AM' && hour === 12) {
-      hour = 0;
-    }
+        instances.push({
+          config,
+          start,
+          end,
+          isNextDay: blockDay.getTime() !== todayMs,
+        });
 
-    return hour;
-  }
-
-  /**
-   * Find hourly weather data for a specific hour
-   * @param hourlyData - Array of hourly weather forecasts
-   * @param targetHour - Target hour in 24-hour format
-   * @returns Hourly weather data or null if not found
-   */
-  private static findHourlyDataForHour(
-    hourlyData: HourlyWeather[],
-    targetHour: number
-  ): HourlyWeather | null {
-    for (const hourly of hourlyData) {
-      const hour = this.parseTimeString(hourly.time);
-      if (hour === targetHour) {
-        return hourly;
+        if (instances.length >= count) break;
       }
     }
-    return null;
+
+    return instances;
   }
 
   /**
-   * Get average weather data for a time block range
+   * Average the hourly forecasts that fall within a concrete datetime range.
+   *
+   * Matching on absolute timestamps (not clock hour) is what keeps today's and
+   * tomorrow's hours from being mixed together when the rolling forecast window
+   * spans the same clock hours across midnight.
+   *
    * @param hourlyData - Array of hourly weather forecasts
-   * @param startHour - Start hour in 24-hour format
-   * @param endHour - End hour in 24-hour format
-   * @returns Average weather data for the block or null if no data found
+   * @param start - Block start (inclusive)
+   * @param end - Block end (exclusive)
+   * @returns Averaged weather data for the range, or null if no hours match
    */
-  private static getAverageWeatherForBlock(
+  private static getAverageWeatherForRange(
     hourlyData: HourlyWeather[],
-    startHour: number,
-    endHour: number
+    start: Date,
+    end: Date
   ): { temp: number; condition: WeatherCondition; precipitationProbability?: number; snowAccumulation?: number } | null {
-    const relevantData: HourlyWeather[] = [];
+    const startMs = start.getTime();
+    const endMs = end.getTime();
 
-    for (const hourly of hourlyData) {
-      const hour = this.parseTimeString(hourly.time);
-      if (hour >= startHour && hour < endHour) {
-        relevantData.push(hourly);
-      }
-    }
+    const relevantData = hourlyData.filter((hourly) => {
+      if (!hourly.isoTime) return false;
+      const t = new Date(hourly.isoTime).getTime();
+      return t >= startMs && t < endMs;
+    });
 
     if (relevantData.length === 0) {
       return null;
     }
 
-    // Calculate average temperature
     const avgTemp = relevantData.reduce((sum, h) => sum + h.temp, 0) / relevantData.length;
 
-    // Use the most common condition, or the first one
+    // Use the first hour's condition as representative of the block
     const condition = relevantData[0].condition;
 
-    // Average precipitation probability if available
     const precipVals = relevantData
-      .map(h => h.precipitationProbability)
+      .map((h) => h.precipitationProbability)
       .filter((p): p is number => p !== undefined);
     const precipitationProbability = precipVals.length > 0
       ? precipVals.reduce((sum, p) => sum + p, 0) / precipVals.length
       : undefined;
 
-    // Calculate total snow accumulation if condition is snow
     let snowAccumulation: number | undefined;
     if (condition === 'snow') {
       const snowVals = relevantData
-        .map(h => h.precipitation)
+        .map((h) => h.precipitation)
         .filter((p): p is number => p !== undefined && p > 0);
       if (snowVals.length > 0) {
         // Sum precipitation (in mm) and convert to cm
         const totalSnowMm = snowVals.reduce((sum, p) => sum + p, 0);
-        snowAccumulation = totalSnowMm / 10; // Convert mm to cm
+        snowAccumulation = totalSnowMm / 10;
       }
     }
 
@@ -175,29 +153,51 @@ export class TimeBlockService {
   }
 
   /**
-   * Map weather data to a time block
-   * @param config - Time block configuration
-   * @param hourlyData - Hourly weather forecast data
-   * @param isNextDay - Whether this block is for tomorrow
-   * @param weatherData - Full weather data including current and daily
-   * @param preschoolMode - If true, adjusts clothing recommendations for children aged 2-5 years
-   * @returns TimeBlockData with weather and clothing recommendations
+   * Estimate a block's weather from the daily forecast when no hourly data is
+   * available (e.g., a block beyond the hourly forecast window).
+   */
+  private static estimateFromDaily(
+    instance: TimeBlockInstance,
+    weatherData: WeatherData | null
+  ): { temp: number; condition: WeatherCondition; precipitationProbability?: number } {
+    const { config, isNextDay } = instance;
+
+    if (weatherData?.daily && weatherData.daily.length > 0) {
+      const dayIndex = isNextDay ? 1 : 0;
+      const dayData = weatherData.daily[Math.min(dayIndex, weatherData.daily.length - 1)];
+
+      let temperature: number;
+      if (config.startHour >= 12 && config.startHour < 17) {
+        temperature = dayData.tempHigh; // Afternoon: daily high
+      } else if (config.startHour >= 8 && config.startHour < 12) {
+        temperature = (dayData.tempLow + dayData.tempHigh) / 2; // Morning: mid
+      } else {
+        temperature = dayData.tempLow + (dayData.tempHigh - dayData.tempLow) * 0.3; // Evening: cooler
+      }
+
+      return {
+        temp: temperature,
+        condition: dayData.condition,
+        precipitationProbability: dayData.precipitationProbability,
+      };
+    }
+
+    return { temp: 15, condition: 'cloudy' };
+  }
+
+  /**
+   * Map a concrete time block instance to its weather and clothing data.
    */
   private static mapWeatherToTimeBlock(
-    config: TimeBlockConfig,
-    hourlyData: HourlyWeather[],
-    isNextDay: boolean,
+    instance: TimeBlockInstance,
     weatherData: WeatherData | null,
-    preschoolMode: boolean = false
+    preschoolMode: boolean
   ): TimeBlockData {
-    // Get average weather data for this time block range
-    const avgWeather = this.getAverageWeatherForBlock(
-      hourlyData,
-      config.startHour,
-      config.endHour
-    );
+    const { config, isNextDay } = instance;
+    const hourlyData = weatherData?.hourly ?? [];
 
-    // If no data found in range, try to find data for the start hour
+    const avgWeather = this.getAverageWeatherForRange(hourlyData, instance.start, instance.end);
+
     let temperature: number;
     let condition: WeatherCondition;
     let precipitationProbability: number | undefined;
@@ -209,42 +209,12 @@ export class TimeBlockService {
       precipitationProbability = avgWeather.precipitationProbability;
       snowAccumulation = avgWeather.snowAccumulation;
     } else {
-      // Fallback to looking for start hour specifically
-      const weatherAtStart = this.findHourlyDataForHour(hourlyData, config.startHour);
-
-      if (weatherAtStart) {
-        temperature = weatherAtStart.temp;
-        condition = weatherAtStart.condition;
-        precipitationProbability = weatherAtStart.precipitationProbability;
-      } else {
-        // Ultimate fallback: use current temperature or daily forecast
-        if (weatherData?.current && !isNextDay) {
-          temperature = weatherData.current.temp;
-          condition = weatherData.current.condition;
-        } else if (weatherData?.daily && weatherData.daily.length > 0) {
-          const dayIndex = isNextDay ? 1 : 0;
-          const dayData = weatherData.daily[dayIndex];
-          // Estimate based on time of day
-          if (config.startHour >= 12 && config.startHour < 17) {
-            // Afternoon: use high temp
-            temperature = dayData.tempHigh;
-          } else if (config.startHour >= 8 && config.startHour < 12) {
-            // Morning: use average of low and high
-            temperature = (dayData.tempLow + dayData.tempHigh) / 2;
-          } else {
-            // Evening: use between average and low
-            temperature = dayData.tempLow + (dayData.tempHigh - dayData.tempLow) * 0.3;
-          }
-          condition = dayData.condition;
-          precipitationProbability = dayData.precipitationProbability;
-        } else {
-          temperature = 15;
-          condition = 'cloudy';
-        }
-      }
+      const estimate = this.estimateFromDaily(instance, weatherData);
+      temperature = estimate.temp;
+      condition = estimate.condition;
+      precipitationProbability = estimate.precipitationProbability;
     }
 
-    // Get clothing recommendations based on temperature
     const clothingItems = ClothingRecommendationService.getRecommendations(temperature, preschoolMode);
 
     return {
@@ -262,28 +232,20 @@ export class TimeBlockService {
   }
 
   /**
-   * Get time blocks with weather data and clothing recommendations
+   * Get the next 3 time blocks with weather data and clothing recommendations.
+   *
    * @param weatherData - Weather data from API
-   * @param currentHour - Current hour (defaults to now)
+   * @param now - Reference time (defaults to current time)
    * @param preschoolMode - If true, adjusts clothing recommendations for children aged 2-5 years
    * @returns Array of 3 TimeBlockData objects
    */
   static getTimeBlocksWithWeather(
     weatherData: WeatherData | null,
-    currentHour?: number,
+    now: Date = new Date(),
     preschoolMode: boolean = false
   ): TimeBlockData[] {
-    if (!weatherData || !weatherData.hourly || weatherData.hourly.length === 0) {
-      // Return empty blocks with default data
-      return this.getNextTimeBlocks(3, currentHour).map(({ config, isNextDay }) =>
-        this.mapWeatherToTimeBlock(config, [], isNextDay, weatherData, preschoolMode)
-      );
-    }
-
-    const nextBlocks = this.getNextTimeBlocks(3, currentHour);
-
-    return nextBlocks.map(({ config, isNextDay }) =>
-      this.mapWeatherToTimeBlock(config, weatherData.hourly, isNextDay, weatherData, preschoolMode)
+    return this.getUpcomingBlockInstances(now, 3).map((instance) =>
+      this.mapWeatherToTimeBlock(instance, weatherData, preschoolMode)
     );
   }
 }
