@@ -10,39 +10,35 @@ import { LocationStorageService } from '@/services/location/LocationStorageServi
 import type { WeatherData } from '@/types/weather';
 import type { Location } from '@/types/location';
 
-// Time-based background arrays
-const BACKGROUNDS = {
-  morning: [
-    '/backgrounds/time-based/morning/morning-1.jpg',
-    '/backgrounds/time-based/morning/morning-2.jpg',
-    '/backgrounds/time-based/morning/morning-3.jpg',
-    '/backgrounds/time-based/morning/morning-4.jpg',
-    '/backgrounds/time-based/morning/morning-5.jpg',
-  ],
-  afternoon: [
-    '/backgrounds/time-based/afternoon/afternoon-1.jpg',
-    '/backgrounds/time-based/afternoon/afternoon-2.jpg',
-    '/backgrounds/time-based/afternoon/afternoon-3.jpg',
-    '/backgrounds/time-based/afternoon/afternoon-4.jpg',
-    '/backgrounds/time-based/afternoon/afternoon-5.jpg',
-  ],
-  evening: [
-    '/backgrounds/time-based/evening/evening-1.jpg',
-    '/backgrounds/time-based/evening/evening-2.jpg',
-    '/backgrounds/time-based/evening/evening-3.jpg',
-    '/backgrounds/time-based/evening/evening-4.jpg',
-    '/backgrounds/time-based/evening/evening-5.jpg',
-  ],
-  night: [
-    '/backgrounds/time-based/night/night-1.jpg',
-    '/backgrounds/time-based/night/night-2.jpg',
-    '/backgrounds/time-based/night/night-3.jpg',
-    '/backgrounds/time-based/night/night-4.jpg',
-    '/backgrounds/time-based/night/night-5.jpg',
-  ],
+// Background images are organised by season and time of day. Each season/period
+// folder holds 5 variants (e.g. summer/morning/morning-1.jpg).
+const SEASONS = ['winter', 'summer'] as const;
+const PERIODS = ['morning', 'afternoon', 'evening', 'night'] as const;
+
+type Season = typeof SEASONS[number];
+type TimePeriod = typeof PERIODS[number];
+
+const buildPeriodBackgrounds = (season: Season): Record<TimePeriod, string[]> =>
+  Object.fromEntries(
+    PERIODS.map((period) => [
+      period,
+      Array.from(
+        { length: 5 },
+        (_, i) => `/backgrounds/time-based/${season}/${period}/${period}-${i + 1}.jpg`
+      ),
+    ])
+  ) as Record<TimePeriod, string[]>;
+
+const BACKGROUNDS: Record<Season, Record<TimePeriod, string[]>> = {
+  winter: buildPeriodBackgrounds('winter'),
+  summer: buildPeriodBackgrounds('summer'),
 };
 
-type TimePeriod = keyof typeof BACKGROUNDS;
+// Montréal: snow-season months (Nov–Mar) use the winter set, the rest use summer.
+const getCurrentSeason = (): Season => {
+  const month = new Date().getMonth(); // 0 = January
+  return month >= 3 && month <= 9 ? 'summer' : 'winter';
+};
 
 // Get current time period based on hour
 const getCurrentTimePeriod = (): TimePeriod => {
@@ -53,10 +49,10 @@ const getCurrentTimePeriod = (): TimePeriod => {
   return 'night'; // 21-5
 };
 
-// Select a random background for current time period, optionally excluding the current one
+// Select a random background for the current season and time period,
+// optionally excluding the current one
 const getRandomBackground = (excludeCurrent?: string) => {
-  const period = getCurrentTimePeriod();
-  const periodBackgrounds = BACKGROUNDS[period];
+  const periodBackgrounds = BACKGROUNDS[getCurrentSeason()][getCurrentTimePeriod()];
 
   if (excludeCurrent && periodBackgrounds.length > 1) {
     const availableBackgrounds = periodBackgrounds.filter(bg => bg !== excludeCurrent);
