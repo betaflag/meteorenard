@@ -23,6 +23,7 @@ export interface HourlyWeather {
 export interface CurrentWeather {
   location: string;
   temp: number;
+  feelsLike?: number; // Apparent temperature; absent when the provider lacks it
   condition: WeatherCondition;
   description: string;
 }

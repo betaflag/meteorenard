@@ -1,9 +1,10 @@
-import { MapPin } from 'lucide-react';
+import { MapPin, Wind } from 'lucide-react';
 import type { Location } from '@/types/location';
 import type { WeatherData } from '@/types/weather';
 import { WeatherIcon } from '@/components/weather/WeatherIcon';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { translateCondition } from './timeBlockLabels';
+import { getTempDisplay } from './tempDisplay';
 
 interface CurrentWeatherWidgetProps {
   location: Location | null;
@@ -37,6 +38,8 @@ export function CurrentWeatherWidget({ location, weather }: CurrentWeatherWidget
     return null;
   }
 
+  const temp = current ? getTempDisplay(current.temp, current.feelsLike) : null;
+
   return (
     <div className="flex items-center justify-between w-full">
       {location ? (
@@ -53,7 +56,7 @@ export function CurrentWeatherWidget({ location, weather }: CurrentWeatherWidget
         <span />
       )}
 
-      {current && (
+      {current && temp && (
         <div style={pillStyle}>
           <span style={{ color: '#C5A572', display: 'flex' }}>
             <WeatherIcon condition={current.condition} size={20} />
@@ -66,8 +69,17 @@ export function CurrentWeatherWidget({ location, weather }: CurrentWeatherWidget
           </span>
           <span style={{ color: 'rgba(255, 255, 255, 0.5)', fontWeight: 700 }}>·</span>
           <span className="font-raleway font-bold text-white" style={{ fontSize: '1rem' }}>
-            {Math.round(current.temp)}°
+            {temp.hero}°
           </span>
+          {temp.showActual && (
+            <span
+              className="flex items-center font-raleway"
+              style={{ gap: '3px', fontSize: '0.8125rem', color: 'rgba(255, 255, 255, 0.6)' }}
+            >
+              <Wind size={13} />
+              {temp.actual}°
+            </span>
+          )}
         </div>
       )}
     </div>

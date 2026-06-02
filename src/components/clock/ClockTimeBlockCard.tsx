@@ -1,10 +1,11 @@
 import { Card, CardContent } from '@/components/ui/card';
 import type { TimeBlockData } from '@/services/timeBlock/types';
 import { WeatherIcon } from '@/components/weather/WeatherIcon';
-import { Droplets, Snowflake } from 'lucide-react';
+import { Droplets, Snowflake, Wind } from 'lucide-react';
 import { getClothingIcon } from '@/services/clothing/clothingIconMap';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getTimeBlockLabel, translateClothingItem } from './timeBlockLabels';
+import { getTempDisplay } from './tempDisplay';
 
 interface ClockTimeBlockCardProps {
   data: TimeBlockData;
@@ -25,6 +26,7 @@ export function ClockTimeBlockCard({ data }: ClockTimeBlockCardProps) {
   const {
     period,
     temperature,
+    feelsLike,
     condition,
     precipitationProbability,
     snowAccumulation,
@@ -35,6 +37,14 @@ export function ClockTimeBlockCard({ data }: ClockTimeBlockCardProps) {
   // Show top 4 clothing items for more compact display
   const displayItems = clothingItems.slice(0, 4);
   const translatedLabel = getTimeBlockLabel(t, period, isNextDay);
+  const temp = getTempDisplay(temperature, feelsLike);
+
+  const showSnow =
+    condition === 'snow' && snowAccumulation !== undefined && snowAccumulation > 0;
+  const precipPercent =
+    precipitationProbability !== undefined ? Math.round(precipitationProbability) : 0;
+  const showPrecip = !showSnow && precipPercent > 0;
+  const hasSecondary = temp.showActual || showSnow || showPrecip;
 
   return (
     <Card
@@ -65,15 +75,31 @@ export function ClockTimeBlockCard({ data }: ClockTimeBlockCardProps) {
 
         {/* Weather and clothing combined section */}
         <div className="flex-1 flex flex-col justify-between">
-          {/* Weather info - more compact */}
-          <div className="flex items-center justify-center gap-6">
-            <div className="flex-shrink-0" style={{ color: '#C5A572', filter: 'drop-shadow(0 0 8px rgba(197, 165, 114, 0.6))' }}>
-              <WeatherIcon
-                condition={condition}
-                size={72}
-              />
-            </div>
-            <div className="flex flex-col items-center">
+          {/* Weather info - feels-like label, hero row, then one secondary line */}
+          <div className="flex flex-col items-center">
+            {temp.isFeelsLike && (
+              <span
+                className="font-raleway font-semibold"
+                style={{
+                  fontSize: '0.8rem',
+                  color: '#C5A572',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  marginBottom: '6px',
+                }}
+              >
+                {t.timeBlockDetail.feelsLike}
+              </span>
+            )}
+
+            {/* Hero row: condition icon + primary temperature */}
+            <div className="flex items-center justify-center gap-5">
+              <div
+                className="flex-shrink-0"
+                style={{ color: '#C5A572', filter: 'drop-shadow(0 0 8px rgba(197, 165, 114, 0.6))' }}
+              >
+                <WeatherIcon condition={condition} size={72} />
+              </div>
               <span
                 className="font-raleway font-bold"
                 style={{
@@ -83,23 +109,37 @@ export function ClockTimeBlockCard({ data }: ClockTimeBlockCardProps) {
                   lineHeight: '1',
                 }}
               >
-                {Math.round(temperature)}°
+                {temp.hero}°
               </span>
-              {/* Show snow accumulation if condition is snow, otherwise show precipitation probability */}
-              {condition === 'snow' && snowAccumulation !== undefined && snowAccumulation > 0 ? (
-                <div className="flex items-center text-[#4fc3f7] mt-1" style={{ gap: '4px', fontSize: '1rem' }}>
-                  <Snowflake size={16} />
-                  <span>{snowAccumulation.toFixed(1)} cm</span>
-                </div>
-              ) : (
-                precipitationProbability !== undefined && precipitationProbability > 0 && (
-                  <div className="flex items-center text-[#4fc3f7] mt-1" style={{ gap: '4px', fontSize: '1rem' }}>
-                    <Droplets size={16} />
-                    <span>{precipitationProbability}%</span>
-                  </div>
-                )
-              )}
             </div>
+
+            {/* Secondary line: actual temperature and precipitation, side by side */}
+            {hasSecondary && (
+              <div className="flex items-center justify-center" style={{ gap: '18px', marginTop: '10px' }}>
+                {temp.showActual && (
+                  <span
+                    className="flex items-center"
+                    style={{ gap: '4px', fontSize: '1rem', color: 'rgba(255, 255, 255, 0.7)' }}
+                  >
+                    <Wind size={15} />
+                    {temp.actual}° {t.timeBlockDetail.actual}
+                  </span>
+                )}
+                {showSnow ? (
+                  <span className="flex items-center text-[#4fc3f7]" style={{ gap: '4px', fontSize: '1rem' }}>
+                    <Snowflake size={16} />
+                    {snowAccumulation!.toFixed(1)} cm
+                  </span>
+                ) : (
+                  showPrecip && (
+                    <span className="flex items-center text-[#4fc3f7]" style={{ gap: '4px', fontSize: '1rem' }}>
+                      <Droplets size={16} />
+                      {precipPercent}%
+                    </span>
+                  )
+                )}
+              </div>
+            )}
           </div>
 
           {/* Clothing section - simplified */}

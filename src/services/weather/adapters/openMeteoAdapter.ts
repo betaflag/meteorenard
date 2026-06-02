@@ -129,6 +129,9 @@ export function adaptOpenMeteoResponse(
     current: {
       location: locationName,
       temp: currentTemp,
+      // current_weather has no apparent temperature; the nearest hour is the
+      // closest available "feels like" for right now.
+      feelsLike: hourlyData[0]?.feelsLike,
       condition: mapWeatherCode(currentWeatherCode),
       description: getWeatherDescription(currentWeatherCode),
     },

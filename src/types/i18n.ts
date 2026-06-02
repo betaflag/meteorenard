@@ -38,6 +38,7 @@ export interface Translations {
   // Time Block detail modal
   timeBlockDetail: {
     feelsLike: string;
+    actual: string;
     high: string;
     low: string;
     wind: string;

@@ -34,6 +34,7 @@ const en: Translations = {
 
   timeBlockDetail: {
     feelsLike: 'Feels like',
+    actual: 'actual',
     high: 'High',
     low: 'Low',
     wind: 'Wind',
@@ -163,6 +164,7 @@ const fr: Translations = {
 
   timeBlockDetail: {
     feelsLike: 'Ressenti',
+    actual: 'réel',
     high: 'Max',
     low: 'Min',
     wind: 'Vent',
