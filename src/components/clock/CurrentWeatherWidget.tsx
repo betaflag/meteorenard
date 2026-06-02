@@ -11,6 +11,7 @@ import { WeatherFox } from './WeatherFox';
 interface CurrentWeatherWidgetProps {
   location: Location | null;
   weather: WeatherData | null;
+  onLocationClick?: () => void;
 }
 
 const BUBBLE_FILL = 'rgba(255, 255, 255, 0.08)';
@@ -127,7 +128,7 @@ function SpeechBubble({ children }: { children: React.ReactNode }) {
  * speech bubble of current conditions with the weather fox tucked beneath it,
  * the bubble's tail pointing down at the fox.
  */
-export function CurrentWeatherWidget({ location, weather }: CurrentWeatherWidgetProps) {
+export function CurrentWeatherWidget({ location, weather, onLocationClick }: CurrentWeatherWidgetProps) {
   const { t } = useLanguage();
   const current = weather?.current;
 
@@ -142,15 +143,21 @@ export function CurrentWeatherWidget({ location, weather }: CurrentWeatherWidget
   return (
     <div className="flex items-start justify-between w-full">
       {location ? (
-        <div style={locationPillStyle}>
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onLocationClick?.();
+          }}
+          aria-label={`Change location — current: ${location.name}`}
+          className="font-raleway transition-transform hover:scale-[1.03] active:scale-95"
+          style={{ ...locationPillStyle, cursor: 'pointer', appearance: 'none' }}
+        >
           <MapPin size={18} style={{ color: '#C5A572' }} />
-          <span
-            className="font-raleway font-semibold text-white"
-            style={{ fontSize: '1rem', letterSpacing: '0.02em' }}
-          >
+          <span className="font-semibold text-white" style={{ fontSize: '1rem', letterSpacing: '0.02em' }}>
             {location.name}
           </span>
-        </div>
+        </button>
       ) : (
         <span />
       )}

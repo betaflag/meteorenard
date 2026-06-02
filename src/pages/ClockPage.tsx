@@ -200,7 +200,11 @@ export function ClockPage() {
         {currentLocation && (
           <div className="flex-shrink-0" style={{ position: 'relative', zIndex: 20, padding: '32px 40px 0 40px' }}>
             <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-              <CurrentWeatherWidget location={currentLocation} weather={weatherData} />
+              <CurrentWeatherWidget
+                location={currentLocation}
+                weather={weatherData}
+                onLocationClick={() => setShowCitySearchDialog(true)}
+              />
             </div>
           </div>
         )}
