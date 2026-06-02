@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { CalendarDays, Clock } from 'lucide-react';
 import { ClockDisplay } from '@/components/clock/ClockDisplay';
 import { ClockTimeBlockCard } from '@/components/clock/ClockTimeBlockCard';
@@ -14,6 +14,7 @@ import { TimeBlockService } from '@/services/timeBlock/TimeBlockService';
 import { fetchWeather } from '@/services/weather/openMeteo';
 import { LocationStorageService } from '@/services/location/LocationStorageService';
 import { useLanguage } from '@/contexts/language';
+import { getZonedNow } from '@/lib/time';
 import type { WeatherData } from '@/types/weather';
 import type { TimeBlockData } from '@/services/timeBlock/types';
 import type { Location } from '@/types/location';
@@ -41,25 +42,26 @@ const BACKGROUNDS: Record<Season, Record<TimePeriod, string[]>> = {
   summer: buildPeriodBackgrounds('summer'),
 };
 
-// Montréal: snow-season months (Nov–Mar) use the winter set, the rest use summer.
-const getCurrentSeason = (): Season => {
-  const month = new Date().getMonth(); // 0 = January
+// Snow-season months (Nov–Mar) use the winter set, the rest use summer. `now` is
+// the selected location's wall clock, so the season matches that location.
+const getCurrentSeason = (now: Date): Season => {
+  const month = now.getMonth(); // 0 = January
   return month >= 3 && month <= 9 ? 'summer' : 'winter';
 };
 
-// Get current time period based on hour
-const getCurrentTimePeriod = (): TimePeriod => {
-  const hour = new Date().getHours();
+// Get the location's time period based on its current hour
+const getCurrentTimePeriod = (now: Date): TimePeriod => {
+  const hour = now.getHours();
   if (hour >= 5 && hour < 11) return 'morning';
   if (hour >= 11 && hour < 17) return 'afternoon';
   if (hour >= 17 && hour < 21) return 'evening';
   return 'night'; // 21-5
 };
 
-// Select a random background for the current season and time period,
+// Select a random background for the location's current season and time period,
 // optionally excluding the current one
-const getRandomBackground = (excludeCurrent?: string) => {
-  const periodBackgrounds = BACKGROUNDS[getCurrentSeason()][getCurrentTimePeriod()];
+const getRandomBackground = (now: Date, excludeCurrent?: string) => {
+  const periodBackgrounds = BACKGROUNDS[getCurrentSeason(now)][getCurrentTimePeriod(now)];
 
   if (excludeCurrent && periodBackgrounds.length > 1) {
     const availableBackgrounds = periodBackgrounds.filter(bg => bg !== excludeCurrent);
@@ -96,12 +98,19 @@ export function ClockPage() {
   const [currentLocation, setCurrentLocation] = useState<Location | null>(() =>
     LocationStorageService.getCurrentLocation()
   );
-  const [backgroundImage, setBackgroundImage] = useState<string>(() => getRandomBackground());
+  const [backgroundImage, setBackgroundImage] = useState<string>(() =>
+    getRandomBackground(getZonedNow())
+  );
   const [showLocationPermissionDialog, setShowLocationPermissionDialog] = useState(false);
   const [showCitySearchDialog, setShowCitySearchDialog] = useState(false);
   const [showGlobePicker, setShowGlobePicker] = useState(false);
   const [forecastView, setForecastView] = useState<'blocks' | 'days'>('blocks');
   const [selectedBlock, setSelectedBlock] = useState<TimeBlockData | null>(null);
+
+  // Latest location timezone, read by the background interval/handler so their
+  // closures aren't stale when the location (and its zone) changes.
+  const timezoneRef = useRef<string | undefined>(undefined);
+  timezoneRef.current = weatherData?.timezone;
 
   const fetchWeatherData = useCallback(async (location: Location) => {
     try {
@@ -157,17 +166,19 @@ export function ClockPage() {
     const intervalId = setInterval(() => {
       // Refresh weather data
       fetchWeatherData(currentLocation);
-      // Rotate background
-      setBackgroundImage(prevBackground => getRandomBackground(prevBackground));
+      // Rotate background using the location's current time
+      setBackgroundImage(prevBackground =>
+        getRandomBackground(getZonedNow(timezoneRef.current), prevBackground)
+      );
     }, REFRESH_INTERVAL);
 
     // Cleanup on unmount
     return () => clearInterval(intervalId);
   }, [currentLocation, fetchWeatherData]);
 
-  // Get time blocks with weather data
+  // Get time blocks with weather data, anchored to the location's current time
   const timeBlocks = weatherData
-    ? TimeBlockService.getTimeBlocksWithWeather(weatherData)
+    ? TimeBlockService.getTimeBlocksWithWeather(weatherData, getZonedNow(weatherData.timezone))
     : [];
 
   // Get the next 3 days for the alternate outlook view
@@ -188,7 +199,9 @@ export function ClockPage() {
     if (target.closest('[data-timeblock-card]')) {
       return;
     }
-    setBackgroundImage(prevBackground => getRandomBackground(prevBackground));
+    setBackgroundImage(prevBackground =>
+      getRandomBackground(getZonedNow(timezoneRef.current), prevBackground)
+    );
   };
 
   return (
@@ -248,7 +261,10 @@ export function ClockPage() {
         >
           {/* Clock Display - Centered and Prominent */}
           <div className="text-center">
-            <ClockDisplay />
+            <ClockDisplay
+              timeZone={weatherData?.timezone}
+              timeZoneAbbreviation={weatherData?.timezoneAbbreviation}
+            />
           </div>
         </div>
 

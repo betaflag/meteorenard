@@ -45,4 +45,8 @@ export interface WeatherData {
   // Sunrise/sunset ISO datetimes starting today (provider may omit them)
   sunrise?: string[];
   sunset?: string[];
+  // Location's timezone, used to show its local time. IANA name (e.g.
+  // "America/Toronto") plus a short abbreviation (e.g. "EDT") for display.
+  timezone: string;
+  timezoneAbbreviation: string;
 }

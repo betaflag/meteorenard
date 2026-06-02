@@ -7,6 +7,7 @@ export interface OpenMeteoResponse {
   latitude: number;
   longitude: number;
   timezone: string;
+  timezone_abbreviation: string;
   current_weather: {
     temperature: number;
     weathercode: number;

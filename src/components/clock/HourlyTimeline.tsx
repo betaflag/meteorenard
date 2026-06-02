@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { Sunrise, Sunset } from 'lucide-react';
 import type { WeatherData } from '@/types/weather';
+import { getZonedNow } from '@/lib/time';
 
 const H = 50; // compact strip height
 const PAD = 8; // small inset for the curve/labels (shading still spans edge to edge)
@@ -51,7 +52,9 @@ export function HourlyTimeline({ weather }: { weather: WeatherData | null }) {
     return () => observer.disconnect();
   }, []);
 
-  const now = Date.now();
+  // Anchor to the location's wall clock so the "now" marker and day/night
+  // shading line up with the naive-local hourly times even in another zone.
+  const now = getZonedNow(weather?.timezone).getTime();
   const end = now + DAY_MS;
 
   const pts: Pt[] = (weather?.hourly ?? [])

@@ -1,5 +1,6 @@
 import type { WeatherData, WeatherCondition } from '@/types/weather';
 import type { OpenMeteoResponse } from './openMeteoTypes';
+import { getZonedNow } from '@/lib/time';
 
 /**
  * Map WMO weather codes to our WeatherCondition types
@@ -87,7 +88,10 @@ export function adaptOpenMeteoResponse(
   // Keep 48 hours of forecast so the clock page's time blocks (which can reach
   // tomorrow evening) always have real hourly data. The chart and hourly widget
   // slice down to the window they display.
-  const now = new Date();
+  //
+  // "now" is the location's wall clock (the hourly times are naive local), so
+  // the future filter is correct even when the device is in another timezone.
+  const now = getZonedNow(response.timezone);
   const hourlyDataFull = response.hourly.time
     .map((time, index) => ({
       time,
@@ -141,5 +145,7 @@ export function adaptOpenMeteoResponse(
     daily: dailyData,
     sunrise: response.daily.sunrise,
     sunset: response.daily.sunset,
+    timezone: response.timezone,
+    timezoneAbbreviation: response.timezone_abbreviation,
   };
 }

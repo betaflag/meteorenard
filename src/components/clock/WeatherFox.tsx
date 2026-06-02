@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import type { WeatherData } from '@/types/weather';
+import { getZonedNow } from '@/lib/time';
 import { getFoxMood, type FoxMood } from './foxMood';
 import foxSnowy from '@/assets/fox/fox-snowy.png';
 import foxStormy from '@/assets/fox/fox-stormy.png';
@@ -90,7 +91,7 @@ const FOX_SPRITES: Record<FoxMood, string[]> = {
  * target and is hidden from assistive tech.
  */
 export function WeatherFox({ weather }: { weather: WeatherData | null }) {
-  const mood = weather ? getFoxMood(weather) : null;
+  const mood = weather ? getFoxMood(weather, getZonedNow(weather.timezone)) : null;
 
   const sprite = useMemo(() => {
     if (!mood) return null;

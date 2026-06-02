@@ -1,19 +1,27 @@
 import { useState, useEffect } from 'react';
+import { getZonedNow, isForeignZone } from '@/lib/time';
 
-export function ClockDisplay() {
-  const [currentTime, setCurrentTime] = useState(new Date());
+interface ClockDisplayProps {
+  /** Location's IANA timezone; the clock follows it. Omit for device time. */
+  timeZone?: string;
+  /** Short zone label (e.g. "JST"), shown only when the zone isn't the device's. */
+  timeZoneAbbreviation?: string;
+}
+
+export function ClockDisplay({ timeZone, timeZoneAbbreviation }: ClockDisplayProps) {
+  const [currentTime, setCurrentTime] = useState(() => getZonedNow(timeZone));
 
   useEffect(() => {
-    // Update every minute
-    const intervalId = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 60000); // Update every 60 seconds
+    const tick = () => setCurrentTime(getZonedNow(timeZone));
 
-    // Also update immediately
-    setCurrentTime(new Date());
+    // Update immediately (e.g. when the timezone changes), then every minute.
+    tick();
+    const intervalId = setInterval(tick, 60000);
 
     return () => clearInterval(intervalId);
-  }, []);
+  }, [timeZone]);
+
+  const showZone = isForeignZone(timeZone) && !!timeZoneAbbreviation;
 
   const formatTime = (date: Date) => {
     const hours = date.getHours().toString().padStart(2, '0');
@@ -66,6 +74,27 @@ export function ClockDisplay() {
       >
         {formatDate(currentTime)}
       </div>
+
+      {/* Timezone label, shown only when the clock follows a non-device zone */}
+      {showZone && (
+        <div
+          className="font-raleway uppercase text-sm sm:text-base md:text-lg"
+          style={{
+            marginTop: '0.75rem',
+            padding: '4px 14px',
+            borderRadius: '9999px',
+            letterSpacing: '0.12em',
+            fontWeight: 600,
+            color: 'rgba(255, 255, 255, 0.85)',
+            background: 'rgba(255, 255, 255, 0.08)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+          }}
+        >
+          {timeZoneAbbreviation}
+        </div>
+      )}
     </div>
   );
 }
