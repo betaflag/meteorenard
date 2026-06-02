@@ -32,8 +32,8 @@ export interface Translations {
     title: string;
     instruction: string;
     resolving: string;
-    selectedPlace: string;
     noSelection: string;
+    loadError: string;
     confirm: string;
     cancel: string;
   };

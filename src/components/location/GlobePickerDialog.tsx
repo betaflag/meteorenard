@@ -40,6 +40,7 @@ export function GlobePickerDialog({
 }: GlobePickerDialogProps) {
   const { t } = useLanguage();
   const [countries, setCountries] = useState<object[] | null>(countriesCache);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [pick, setPick] = useState<GlobePick | null>(null);
   const [location, setLocation] = useState<Location | null>(null);
   const [isResolving, setIsResolving] = useState(false);
@@ -48,10 +49,14 @@ export function GlobePickerDialog({
   const pickToken = useRef(0);
 
   useEffect(() => {
-    if (!open) return;
-    if (!countries) {
-      loadCountries().then(setCountries);
-    }
+    if (!open || countries) return;
+    setLoadFailed(false);
+    loadCountries()
+      .then(setCountries)
+      .catch((error) => {
+        console.error('Failed to load globe country data:', error);
+        setLoadFailed(true);
+      });
   }, [open, countries]);
 
   // Reset the selection each time the dialog closes.
@@ -94,7 +99,11 @@ export function GlobePickerDialog({
 
         {/* Globe canvas fills the available space */}
         <div className="flex-1 min-h-0 rounded-xl overflow-hidden">
-          {countries ? (
+          {loadFailed ? (
+            <div className="w-full h-full flex items-center justify-center text-[#a8a8a8]">
+              {t.globePicker.loadError}
+            </div>
+          ) : countries ? (
             <Suspense fallback={<GlobeLoading />}>
               <PlanetGlobe countries={countries} pick={pick} onPick={handlePick} />
             </Suspense>
