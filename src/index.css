@@ -18,6 +18,13 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+html,
+body {
+  /* Kiosk app never scrolls; stop pull-to-refresh and overscroll bounce so
+     dragging the 3D globe on a touch tablet doesn't reload the page. */
+  overscroll-behavior: none;
+}
+
 body {
   margin: 0;
   min-width: 320px;

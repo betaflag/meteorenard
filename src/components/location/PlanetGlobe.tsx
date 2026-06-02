@@ -84,7 +84,11 @@ export function PlanetGlobe({ countries, pick, onPick }: PlanetGlobeProps) {
   const pins = pick ? [pick] : [];
 
   return (
-    <div ref={containerRef} className="w-full h-full">
+    <div
+      ref={containerRef}
+      className="w-full h-full"
+      style={{ touchAction: 'none', overscrollBehavior: 'none' }}
+    >
       {w > 0 && h > 0 && (
         <Globe
           ref={globeRef}
