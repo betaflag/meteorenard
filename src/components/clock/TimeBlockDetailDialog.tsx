@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/dialog';
 import type { TimeBlockData } from '@/services/timeBlock/types';
 import { WeatherIcon } from '@/components/weather/WeatherIcon';
-import { getClothingIcon, SUN_PROTECTION_COLOR } from '@/services/clothing/clothingIconMap';
+import { getClothingIcon, protectionTint } from '@/services/clothing/clothingIconMap';
 import { useLanguage } from '@/contexts/language';
 import {
   getTimeBlockLabel,
@@ -270,7 +270,7 @@ export function TimeBlockDetailDialog({ block, onClose }: TimeBlockDetailDialogP
                   {block.clothingItems.map((item, index) => {
                     const iconFilename = getClothingIcon(item.id);
                     const iconUrl = iconFilename ? getClothingIconUrl(iconFilename) : undefined;
-                    const isSun = item.category === 'sun-protection';
+                    const tint = protectionTint(item.category);
                     return (
                       <div
                         key={`${item.id}-${index}`}
@@ -282,19 +282,17 @@ export function TimeBlockDetailDialog({ block, onClose }: TimeBlockDetailDialogP
                           style={{
                             width: '60px',
                             height: '60px',
-                            background: isSun ? 'rgba(242, 201, 76, 0.10)' : 'rgba(255, 107, 0, 0.08)',
-                            border: isSun
-                              ? '1px solid rgba(242, 201, 76, 0.28)'
-                              : '1px solid rgba(255, 107, 0, 0.2)',
+                            background: tint ? `${tint}1A` : 'rgba(255, 107, 0, 0.08)',
+                            border: tint ? `1px solid ${tint}55` : '1px solid rgba(255, 107, 0, 0.2)',
                           }}
                         >
                           {iconUrl ? (
-                            isSun ? (
+                            tint ? (
                               <div
                                 style={{
                                   width: '2.25rem',
                                   height: '2.25rem',
-                                  backgroundColor: SUN_PROTECTION_COLOR,
+                                  backgroundColor: tint,
                                   WebkitMaskImage: `url(${iconUrl})`,
                                   maskImage: `url(${iconUrl})`,
                                   WebkitMaskRepeat: 'no-repeat',

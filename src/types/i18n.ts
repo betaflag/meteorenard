@@ -146,5 +146,6 @@ export interface Translations {
     shortSleeve: string;
     shortsSkirt: string;
     sunscreen: string;
+    umbrella: string;
   };
 }

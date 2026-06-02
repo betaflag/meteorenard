@@ -28,6 +28,7 @@ export function translateClothingItem(t: Translations, itemId: string): string {
     'short-sleeve-shirt': 'shortSleeve',
     'shorts-skirt': 'shortsSkirt',
     sunscreen: 'sunscreen',
+    umbrella: 'umbrella',
   };
 
   const translationKey = idToKeyMap[itemId];

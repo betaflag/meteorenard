@@ -2,7 +2,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import type { TimeBlockData } from '@/services/timeBlock/types';
 import { WeatherIcon } from '@/components/weather/WeatherIcon';
 import { Droplets, Snowflake, Wind, Sun } from 'lucide-react';
-import { getClothingIcon, SUN_PROTECTION_COLOR } from '@/services/clothing/clothingIconMap';
+import { getClothingIcon, protectionTint } from '@/services/clothing/clothingIconMap';
 import { useLanguage } from '@/contexts/language';
 import { getTimeBlockLabel, translateClothingItem } from './timeBlockLabels';
 import { getTempDisplay } from './tempDisplay';
@@ -35,16 +35,15 @@ export function ClockTimeBlockCard({ data }: ClockTimeBlockCardProps) {
     isNextDay,
   } = data;
 
-  // Show up to 4 clothing items for a compact display. When sunscreen is
-  // recommended (high UV), keep it visible even if it would fall outside the
-  // first four by swapping it into the last slot.
+  // Show up to 4 items, but always keep the weather-driven "protection" items
+  // (sunscreen, umbrella) visible — fill the remaining slots with clothing.
   const MAX_ITEMS = 4;
-  const topItems = clothingItems.slice(0, MAX_ITEMS);
-  const sunscreen = clothingItems.find((item) => item.id === 'sunscreen');
-  const displayItems =
-    sunscreen && !topItems.some((item) => item.id === 'sunscreen')
-      ? [...clothingItems.filter((item) => item.id !== 'sunscreen').slice(0, MAX_ITEMS - 1), sunscreen]
-      : topItems;
+  const protectionItems = clothingItems.filter((item) => protectionTint(item.category));
+  const regularItems = clothingItems.filter((item) => !protectionTint(item.category));
+  const displayItems = [
+    ...regularItems.slice(0, Math.max(0, MAX_ITEMS - protectionItems.length)),
+    ...protectionItems,
+  ];
   const translatedLabel = getTimeBlockLabel(t, period, isNextDay);
   const temp = getTempDisplay(temperature, feelsLike);
 
@@ -151,6 +150,7 @@ export function ClockTimeBlockCard({ data }: ClockTimeBlockCardProps) {
               {displayItems.map((item, index) => {
                 const iconFilename = getClothingIcon(item.id);
                 const iconUrl = iconFilename ? getClothingIconUrl(iconFilename) : undefined;
+                const tint = protectionTint(item.category);
 
                 return (
                   <div
@@ -159,14 +159,14 @@ export function ClockTimeBlockCard({ data }: ClockTimeBlockCardProps) {
                     title={translateClothingItem(t, item.id)}
                   >
                     {iconUrl ? (
-                      item.category === 'sun-protection' ? (
+                      tint ? (
                         <div
                           className="flex-shrink-0"
                           style={{
                             width: '2.5rem',
                             height: '2.5rem',
                             opacity: 0.9,
-                            backgroundColor: SUN_PROTECTION_COLOR,
+                            backgroundColor: tint,
                             WebkitMaskImage: `url(${iconUrl})`,
                             maskImage: `url(${iconUrl})`,
                             WebkitMaskRepeat: 'no-repeat',

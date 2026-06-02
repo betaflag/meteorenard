@@ -9,7 +9,8 @@ export type ClothingCategory =
   | 'outerwear'
   | 'pants'
   | 'footwear'
-  | 'sun-protection';
+  | 'sun-protection'
+  | 'rain-protection';
 
 export interface ClothingItem {
   id: string;

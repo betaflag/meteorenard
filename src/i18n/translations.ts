@@ -136,6 +136,7 @@ const en: Translations = {
     shortSleeve: 'Short-sleeve shirt',
     shortsSkirt: 'Shorts/skirt',
     sunscreen: 'Sunscreen',
+    umbrella: 'Umbrella',
   },
 };
 
@@ -275,6 +276,7 @@ const fr: Translations = {
     shortSleeve: 'Chandail à manches courtes',
     shortsSkirt: 'Bermuda/jupe',
     sunscreen: 'Écran solaire',
+    umbrella: 'Parapluie',
   },
 };
 

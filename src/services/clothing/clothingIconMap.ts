@@ -3,8 +3,18 @@
  * Icons are located in src/assets/clothing/
  */
 
-/** Tint for sun-protection items (sunscreen), set apart from the clothing orange. */
-export const SUN_PROTECTION_COLOR = '#F2C94C';
+import type { ClothingCategory } from './types';
+
+/** Distinct tints for non-clothing "protection" items, set apart from the clothing orange. */
+const PROTECTION_TINTS: Partial<Record<ClothingCategory, string>> = {
+  'sun-protection': '#F2C94C', // sunscreen — sun yellow
+  'rain-protection': '#4fc3f7', // umbrella — precip blue
+};
+
+/** Tint for a protection-category item, or undefined for ordinary clothing. */
+export function protectionTint(category: ClothingCategory): string | undefined {
+  return PROTECTION_TINTS[category];
+}
 
 export const CLOTHING_ICON_MAP: Record<string, string> = {
   // Below 0°C - Full winter gear
@@ -38,6 +48,9 @@ export const CLOTHING_ICON_MAP: Record<string, string> = {
   'shorts-skirt': 'short.png',
   'outdoor-shoes-3': 'espadrilles.png',
   'sunscreen': 'creme-solaire.png',
+
+  // Weather-driven extras (injected by condition, not temperature tier)
+  'umbrella': 'parapluie.png',
 };
 
 /**

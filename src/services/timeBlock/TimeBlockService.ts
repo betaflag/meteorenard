@@ -13,6 +13,7 @@ interface BlockWeather {
   precipitationProbability?: number;
   snowAccumulation?: number;
   feelsLike?: number;
+  feelsLikeMin?: number;
   windSpeed?: number;
   humidity?: number;
   tempHigh: number;
@@ -85,6 +86,37 @@ export class TimeBlockService {
       return items;
     }
     return [...items, this.SUNSCREEN_ITEM];
+  }
+
+  /**
+   * Precipitation probability (%) at or above which an umbrella is suggested.
+   */
+  private static readonly RAIN_PROBABILITY_THRESHOLD = 50;
+
+  private static readonly UMBRELLA_ITEM: ClothingItem = {
+    id: 'umbrella',
+    name: 'Umbrella',
+    category: 'rain-protection',
+  };
+
+  /**
+   * Add an umbrella when the block is rainy (a rain/storm condition or a high
+   * precipitation probability). Snow is excluded — that's handled by the cold
+   * temperature tiers. Returns a new array only when injecting.
+   */
+  private static applyRainGear(items: ClothingItem[], weather: BlockWeather | null): ClothingItem[] {
+    if (!weather || weather.condition === 'snow') {
+      return items;
+    }
+    const rainy =
+      weather.condition === 'rain' ||
+      weather.condition === 'heavy-rain' ||
+      weather.condition === 'thunderstorm' ||
+      (weather.precipitationProbability ?? 0) >= this.RAIN_PROBABILITY_THRESHOLD;
+    if (!rainy || items.some((item) => item.id === 'umbrella')) {
+      return items;
+    }
+    return [...items, this.UMBRELLA_ITEM];
   }
 
   /**
@@ -183,6 +215,13 @@ export class TimeBlockService {
     const windSpeed = average((h) => h.windSpeed);
     const humidity = average((h) => h.humidity);
 
+    // Coldest feels-like in the block — used to dress for the chilliest part
+    // rather than the average (which can under-dress a cold morning start).
+    const feelsLikeVals = relevantData
+      .map((h) => h.feelsLike)
+      .filter((v): v is number => v !== undefined);
+    const feelsLikeMin = feelsLikeVals.length > 0 ? Math.min(...feelsLikeVals) : undefined;
+
     // Peak (not average) UV: sun protection is driven by the strongest exposure
     // during the block, not its mean.
     const uvVals = relevantData
@@ -208,6 +247,7 @@ export class TimeBlockService {
       precipitationProbability,
       snowAccumulation,
       feelsLike,
+      feelsLikeMin,
       windSpeed,
       humidity,
       tempHigh,
@@ -279,8 +319,11 @@ export class TimeBlockService {
       precipitationProbability = estimate.precipitationProbability;
     }
 
-    const baseClothing = ClothingRecommendationService.getRecommendations(temperature);
-    const clothingItems = this.applySunProtection(baseClothing, avgWeather?.uvIndex);
+    // Dress for how cold it actually feels at the chilliest point of the block.
+    const dressTemperature = avgWeather?.feelsLikeMin ?? avgWeather?.tempLow ?? temperature;
+    const baseClothing = ClothingRecommendationService.getRecommendations(dressTemperature);
+    const withSun = this.applySunProtection(baseClothing, avgWeather?.uvIndex);
+    const clothingItems = this.applyRainGear(withSun, avgWeather);
 
     return {
       period: config.period,
