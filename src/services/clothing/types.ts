@@ -24,10 +24,3 @@ export interface ClothingRecommendation {
   };
   items: ClothingItem[];
 }
-
-export type TemperatureRange =
-  | 'extreme-cold' // < 0°C
-  | 'cold' // 0-8°C
-  | 'cool' // 8-18°C
-  | 'mild' // 18-22°C
-  | 'warm'; // 22°C+

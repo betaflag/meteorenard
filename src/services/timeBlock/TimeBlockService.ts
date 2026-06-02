@@ -255,8 +255,7 @@ export class TimeBlockService {
    */
   private static mapWeatherToTimeBlock(
     instance: TimeBlockInstance,
-    weatherData: WeatherData | null,
-    preschoolMode: boolean
+    weatherData: WeatherData | null
   ): TimeBlockData {
     const { config, isNextDay } = instance;
     const hourlyData = weatherData?.hourly ?? [];
@@ -280,7 +279,7 @@ export class TimeBlockService {
       precipitationProbability = estimate.precipitationProbability;
     }
 
-    const baseClothing = ClothingRecommendationService.getRecommendations(temperature, preschoolMode);
+    const baseClothing = ClothingRecommendationService.getRecommendations(temperature);
     const clothingItems = this.applySunProtection(baseClothing, avgWeather?.uvIndex);
 
     return {
@@ -309,16 +308,14 @@ export class TimeBlockService {
    *
    * @param weatherData - Weather data from API
    * @param now - Reference time (defaults to current time)
-   * @param preschoolMode - If true, adjusts clothing recommendations for children aged 2-5 years
    * @returns Array of 3 TimeBlockData objects
    */
   static getTimeBlocksWithWeather(
     weatherData: WeatherData | null,
-    now: Date = new Date(),
-    preschoolMode: boolean = false
+    now: Date = new Date()
   ): TimeBlockData[] {
     return this.getUpcomingBlockInstances(now, 3).map((instance) =>
-      this.mapWeatherToTimeBlock(instance, weatherData, preschoolMode)
+      this.mapWeatherToTimeBlock(instance, weatherData)
     );
   }
 }

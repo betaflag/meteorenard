@@ -8,7 +8,7 @@ import { HourlyTimeline } from '@/components/clock/HourlyTimeline';
 import { LocationPermissionDialog } from '@/components/location/LocationPermissionDialog';
 import { CitySearchDialog } from '@/components/location/CitySearchDialog';
 import { TimeBlockService } from '@/services/timeBlock/TimeBlockService';
-import { WeatherServiceFactory } from '@/services/weather/WeatherServiceFactory';
+import { fetchWeather } from '@/services/weather/openMeteo';
 import { LocationStorageService } from '@/services/location/LocationStorageService';
 import type { WeatherData } from '@/types/weather';
 import type { TimeBlockData } from '@/services/timeBlock/types';
@@ -79,8 +79,7 @@ export function ClockPage() {
 
   const fetchWeatherData = useCallback(async (location: Location) => {
     try {
-      const weatherService = WeatherServiceFactory.create();
-      const data = await weatherService.fetchWeather(location);
+      const data = await fetchWeather(location);
       setWeatherData(data);
     } catch (err) {
       console.error('Weather fetch error:', err);
@@ -142,7 +141,7 @@ export function ClockPage() {
 
   // Get time blocks with weather data
   const timeBlocks = weatherData
-    ? TimeBlockService.getTimeBlocksWithWeather(weatherData, undefined, false)
+    ? TimeBlockService.getTimeBlocksWithWeather(weatherData)
     : [];
 
   // Get the next time block's weather condition for effects

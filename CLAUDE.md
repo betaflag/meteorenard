@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Météo Renard is a full-screen weather **clock** for Montréal, QC, built for an always-on tablet in kiosk mode (landscape). React, TypeScript, Vite, and Tailwind CSS. It fetches weather from multiple providers and shows a large clock, the current conditions with a mascot fox dressed for the weather, three upcoming time-block cards with clothing recommendations, and a compact 24-hour timeline.
+Météo Renard is a full-screen weather **clock** for Montréal, QC, built for an always-on tablet in kiosk mode (landscape). React, TypeScript, Vite, and Tailwind CSS. It fetches weather from Open-Meteo and shows a large clock, the current conditions with a mascot fox dressed for the weather, three upcoming time-block cards with clothing recommendations, and a compact 24-hour timeline.
 
 The clock is the only screen, served at the root path `/`. The legacy `/clock` path redirects to `/`.
 
@@ -29,38 +29,15 @@ npm run gemini -- "prompt text" output_filename
 
 ## Architecture
 
-### Multi-Provider Weather Service Architecture
+### Weather Data
 
-The application uses the **Strategy Pattern** to support multiple weather data providers. This is implemented through:
+Weather comes from **Open-Meteo**. `src/services/weather/openMeteo.ts` exposes a single `fetchWeather(location)` that requests the forecast (current + hourly incl. UV, daily incl. sunrise/sunset) and normalizes it via an adapter.
 
-1. **Service Interface**: `src/services/weather/IWeatherService.ts` - Defines the contract all weather services must implement
-2. **Factory**: `src/services/weather/WeatherServiceFactory.ts` - Creates the appropriate service based on configuration
-3. **Concrete Services**:
-   - `OpenMeteoService.ts` - Open-Meteo API integration
-   - `MSCGeoMetService.ts` - Meteorological Service of Canada GeoMet API integration
-
-To add a new weather provider:
-1. Create a new service class implementing `IWeatherService`
-2. Create an adapter in `src/services/weather/adapters/` to transform the provider's response format to our `WeatherData` type
-3. Add the provider to the factory's switch statement
-4. Update the `WeatherProvider` type in `src/config/weather.config.ts`
+The clock needs UV, sunrise/sunset, feels-like, wind, and humidity, which the previous MSC/Environment-Canada provider did not expose, so the multi-provider abstraction was removed. If a second provider is ever needed, reintroduce a small interface + adapter at that point — don't pre-build it.
 
 ### Adapter Pattern for API Responses
 
-Each weather service has an adapter that transforms provider-specific API responses into our normalized `WeatherData` format. Adapters are located in `src/services/weather/adapters/`:
-
-- `openMeteoAdapter.ts` - Transforms Open-Meteo responses (WMO weather codes, hourly data)
-- `mscGeoMetAdapter.ts` - Transforms MSC GeoMet responses (different weather code system)
-
-This decouples the UI from specific API formats and makes it easy to switch providers or add new ones.
-
-### Configuration
-
-Weather service configuration is centralized in `src/config/weather.config.ts`:
-- Active weather provider selection
-- Location coordinates (Montréal: 45.5017, -73.5673)
-- API endpoints for each provider
-- Refresh interval (10 minutes by default)
+`src/services/weather/adapters/openMeteoAdapter.ts` transforms the Open-Meteo response (WMO weather codes, hourly/daily arrays) into the normalized `WeatherData` type, keeping the UI decoupled from the API's shape.
 
 ### Service Layer
 
