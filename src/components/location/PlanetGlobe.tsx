@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { memo, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Globe, { type GlobeMethods } from 'react-globe.gl';
 import { MeshPhongMaterial } from 'three';
 
@@ -38,12 +38,20 @@ const htmlLat = (d: object) => (d as GlobePick).lat;
 const htmlLng = (d: object) => (d as GlobePick).lng;
 
 function makePin(): HTMLElement {
+  // Outer element handles positioning; the inner one carries the drop animation
+  // so the bounce never fights the translate that anchors the pin to its point.
   const el = document.createElement('div');
-  el.textContent = '📍';
-  el.style.fontSize = '34px';
   el.style.transform = 'translate(-50%, -100%)';
   el.style.pointerEvents = 'none';
-  el.style.filter = 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))';
+
+  const inner = document.createElement('div');
+  inner.textContent = '📍';
+  inner.style.fontSize = '34px';
+  inner.style.transformOrigin = 'bottom center';
+  inner.style.filter = 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))';
+  inner.style.animation = 'pin-drop 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.2)';
+  el.appendChild(inner);
+
   return el;
 }
 
@@ -51,8 +59,13 @@ function makePin(): HTMLElement {
  * Interactive cartoon Earth built on react-globe.gl: a flat ocean sphere with
  * accurate country polygons, a soft atmosphere glow, and touch-friendly
  * rotate/zoom/pan. Tapping the globe reports the lat/lng to the parent.
+ *
+ * Memoized so the parent dialog's geocoding state changes (resolving spinner,
+ * resolved name) don't re-render the heavy WebGL globe — only a new `pick`
+ * (a fresh tap) or `countries` does. Requires `onPick` to be a stable
+ * reference from the parent.
  */
-export function PlanetGlobe({ countries, pick, onPick }: PlanetGlobeProps) {
+function PlanetGlobeComponent({ countries, pick, onPick }: PlanetGlobeProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const globeRef = useRef<GlobeMethods | undefined>(undefined);
   const [{ w, h }, setSize] = useState({ w: 0, h: 0 });
@@ -145,3 +158,5 @@ export function PlanetGlobe({ countries, pick, onPick }: PlanetGlobeProps) {
     </div>
   );
 }
+
+export const PlanetGlobe = memo(PlanetGlobeComponent);

@@ -81,6 +81,22 @@ body {
   }
 }
 
+/* Globe location pin dropping in when a spot is tapped */
+@keyframes pin-drop {
+  0% {
+    opacity: 0;
+    transform: translateY(-18px) scale(0.6);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(0) scale(1.12);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 /* Apply animations */
 .animate-fade-in {
   animation: fade-in 0.7s ease-out;

@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useRef, useState } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -68,7 +68,9 @@ export function GlobePickerDialog({
     }
   }, [open]);
 
-  const handlePick = (next: GlobePick) => {
+  // Stable identity so the memoized PlanetGlobe doesn't re-render when geocoding
+  // state changes — the pin drops on tap, and resolving happens off to the side.
+  const handlePick = useCallback((next: GlobePick) => {
     const token = ++pickToken.current;
     setPick(next);
     setLocation(null);
@@ -78,7 +80,7 @@ export function GlobePickerDialog({
       setLocation(resolved);
       setIsResolving(false);
     });
-  };
+  }, []);
 
   const handleConfirm = () => {
     if (!location) return;
