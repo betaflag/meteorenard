@@ -109,11 +109,20 @@ function PlanetGlobeComponent({ countries, pick, onPick }: PlanetGlobeProps) {
     const controls = globe.controls();
     controls.autoRotate = true;
     controls.autoRotateSpeed = 0.4;
-    controls.enablePan = true;
-    controls.minDistance = 130;
-    controls.maxDistance = 500;
-    controls.rotateSpeed = 0.6;
-    controls.zoomSpeed = 0.8;
+    // Kid-friendly lock-down: rotate and zoom only. Panning is disabled so the
+    // globe can't be dragged off-centre and "lost"; damping keeps flings from
+    // spinning out; the polar clamp keeps the Earth upright (no flipping over
+    // the poles); and a tight zoom range stops it shrinking to a dot or
+    // clipping inside the surface.
+    controls.enablePan = false;
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.12;
+    controls.minPolarAngle = Math.PI * 0.15;
+    controls.maxPolarAngle = Math.PI * 0.85;
+    controls.minDistance = 160;
+    controls.maxDistance = 360;
+    controls.rotateSpeed = 0.55;
+    controls.zoomSpeed = 0.7;
 
     const stopSpin = () => {
       controls.autoRotate = false;
