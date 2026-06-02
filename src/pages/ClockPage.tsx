@@ -193,9 +193,9 @@ export function ClockPage() {
           margin: '0 auto',
         }}
       >
-        {/* Top Bar - Location and current conditions */}
+        {/* Top Bar - Location pill, and the fox speech bubble + fox (overhangs below) */}
         {currentLocation && (
-          <div className="flex-shrink-0" style={{ padding: '32px 40px 0 40px' }}>
+          <div className="flex-shrink-0" style={{ position: 'relative', zIndex: 20, padding: '32px 40px 0 40px' }}>
             <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
               <CurrentWeatherWidget location={currentLocation} weather={weatherData} />
             </div>
