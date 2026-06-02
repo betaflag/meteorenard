@@ -12,6 +12,8 @@ import foxFoggy from '@/assets/fox/fox-foggy.png';
 import foxSleepy from '@/assets/fox/fox-sleepy.png';
 import foxMorning from '@/assets/fox/fox-morning.png';
 import foxCloudy from '@/assets/fox/fox-cloudy.png';
+import foxCool from '@/assets/fox/fox-cool.png';
+import foxWarm from '@/assets/fox/fox-warm.png';
 import foxMild from '@/assets/fox/fox-mild.png';
 
 // Each mood can carry several pose variants; one is chosen at random and stays
@@ -28,6 +30,8 @@ const FOX_SPRITES: Record<FoxMood, string[]> = {
   sleepy: [foxSleepy],
   morning: [foxMorning],
   cloudy: [foxCloudy],
+  cool: [foxCool],
+  warm: [foxWarm],
   mild: [foxMild],
 };
 

@@ -17,6 +17,8 @@ export type FoxMood =
   | 'sleepy'
   | 'morning'
   | 'cloudy'
+  | 'cool'
+  | 'warm'
   | 'mild';
 
 /**
@@ -25,8 +27,9 @@ export type FoxMood =
  * Precedence (first match wins): notable weather comes first so the fox always
  * reflects anything worth dressing for — snow/deep-cold, thunderstorm, rain,
  * cold, heat, strong sun, wind, fog. Only when the weather is unremarkable does
- * the time of day take over (sleepy at night, stretching in the morning),
- * falling back to an overcast or plain-mild fox.
+ * the time of day take over (sleepy at night, stretching in the morning), then
+ * an overcast cloudy fox, otherwise the fox dresses by temperature band:
+ * cool (8-18), mild (18-22), warm (22-30).
  *
  * Driven by feels-like (falling back to air temp) plus the nearest hour's UV
  * and wind, mirroring the same signals the cards use.
@@ -48,9 +51,12 @@ export function getFoxMood(weather: WeatherData, now: Date = new Date()): FoxMoo
   if (windSpeed >= 30) return 'windy';
   if (condition === 'fog') return 'foggy';
 
-  // Calm weather — let the time of day give the fox some personality.
+  // Calm weather — give the fox some personality by time of day, then dress it
+  // by temperature band (cold < 8 is already handled above).
   if (hour >= 21 || hour < 6) return 'sleepy';
   if (hour < 9) return 'morning';
   if (condition === 'cloudy') return 'cloudy';
+  if (effectiveTemp < 18) return 'cool';
+  if (effectiveTemp >= 22) return 'warm';
   return 'mild';
 }
