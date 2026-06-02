@@ -7,6 +7,7 @@ import { CurrentWeatherWidget } from '@/components/clock/CurrentWeatherWidget';
 import { HourlyTimeline } from '@/components/clock/HourlyTimeline';
 import { LocationPermissionDialog } from '@/components/location/LocationPermissionDialog';
 import { CitySearchDialog } from '@/components/location/CitySearchDialog';
+import { GlobePickerDialog } from '@/components/location/GlobePickerDialog';
 import { TimeBlockService } from '@/services/timeBlock/TimeBlockService';
 import { fetchWeather } from '@/services/weather/openMeteo';
 import { LocationStorageService } from '@/services/location/LocationStorageService';
@@ -75,6 +76,7 @@ export function ClockPage() {
   const [backgroundImage, setBackgroundImage] = useState<string>(() => getRandomBackground());
   const [showLocationPermissionDialog, setShowLocationPermissionDialog] = useState(false);
   const [showCitySearchDialog, setShowCitySearchDialog] = useState(false);
+  const [showGlobePicker, setShowGlobePicker] = useState(false);
   const [selectedBlock, setSelectedBlock] = useState<TimeBlockData | null>(null);
 
   const fetchWeatherData = useCallback(async (location: Location) => {
@@ -203,6 +205,7 @@ export function ClockPage() {
                 location={currentLocation}
                 weather={weatherData}
                 onLocationClick={() => setShowCitySearchDialog(true)}
+                onPlanetClick={() => setShowGlobePicker(true)}
               />
             </div>
           </div>
@@ -287,6 +290,13 @@ export function ClockPage() {
         open={showCitySearchDialog}
         onOpenChange={setShowCitySearchDialog}
         onCitySelected={handleCitySelection}
+      />
+
+      {/* 3D Planet location picker */}
+      <GlobePickerDialog
+        open={showGlobePicker}
+        onOpenChange={setShowGlobePicker}
+        onLocationSelected={handleCitySelection}
       />
 
       {/* Time block detail modal */}

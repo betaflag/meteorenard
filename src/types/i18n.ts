@@ -27,6 +27,17 @@ export interface Translations {
     removeCity: string;
   };
 
+  // 3D globe location picker
+  globePicker: {
+    title: string;
+    instruction: string;
+    resolving: string;
+    selectedPlace: string;
+    noSelection: string;
+    confirm: string;
+    cancel: string;
+  };
+
   // Time Blocks
   timeBlocks: {
     morning: string;

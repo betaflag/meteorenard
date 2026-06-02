@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef, useState } from 'react';
-import { MapPin, Wind, Sun } from 'lucide-react';
+import { MapPin, Wind, Sun, Globe } from 'lucide-react';
 import type { Location } from '@/types/location';
 import type { WeatherData } from '@/types/weather';
 import { WeatherIcon } from '@/components/weather/WeatherIcon';
@@ -12,6 +12,7 @@ interface CurrentWeatherWidgetProps {
   location: Location | null;
   weather: WeatherData | null;
   onLocationClick?: () => void;
+  onPlanetClick?: () => void;
 }
 
 const BUBBLE_FILL = 'rgba(255, 255, 255, 0.08)';
@@ -22,6 +23,21 @@ const locationPillStyle: React.CSSProperties = {
   alignItems: 'center',
   gap: '10px',
   padding: '10px 18px',
+  borderRadius: '9999px',
+  background: BUBBLE_FILL,
+  backdropFilter: 'blur(24px)',
+  WebkitBackdropFilter: 'blur(24px)',
+  border: `1px solid ${BUBBLE_BORDER}`,
+  boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 4px 16px rgba(0, 0, 0, 0.35)',
+};
+
+// Round, frosted icon button that opens the 3D planet picker.
+const planetButtonStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '44px',
+  height: '44px',
   borderRadius: '9999px',
   background: BUBBLE_FILL,
   backdropFilter: 'blur(24px)',
@@ -128,7 +144,7 @@ function SpeechBubble({ children }: { children: React.ReactNode }) {
  * speech bubble of current conditions with the weather fox tucked beneath it,
  * the bubble's tail pointing down at the fox.
  */
-export function CurrentWeatherWidget({ location, weather, onLocationClick }: CurrentWeatherWidgetProps) {
+export function CurrentWeatherWidget({ location, weather, onLocationClick, onPlanetClick }: CurrentWeatherWidgetProps) {
   const { t } = useLanguage();
   const current = weather?.current;
 
@@ -143,21 +159,35 @@ export function CurrentWeatherWidget({ location, weather, onLocationClick }: Cur
   return (
     <div className="flex items-start justify-between w-full">
       {location ? (
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onLocationClick?.();
-          }}
-          aria-label={`Change location — current: ${location.name}`}
-          className="font-raleway transition-transform hover:scale-[1.03] active:scale-95"
-          style={{ ...locationPillStyle, cursor: 'pointer', appearance: 'none' }}
-        >
-          <MapPin size={18} style={{ color: '#C5A572' }} />
-          <span className="font-semibold text-white" style={{ fontSize: '1rem', letterSpacing: '0.02em' }}>
-            {location.name}
-          </span>
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onLocationClick?.();
+            }}
+            aria-label={`Change location — current: ${location.name}`}
+            className="font-raleway transition-transform hover:scale-[1.03] active:scale-95"
+            style={{ ...locationPillStyle, cursor: 'pointer', appearance: 'none' }}
+          >
+            <MapPin size={18} style={{ color: '#C5A572' }} />
+            <span className="font-semibold text-white" style={{ fontSize: '1rem', letterSpacing: '0.02em' }}>
+              {location.name}
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onPlanetClick?.();
+            }}
+            aria-label="Explore the planet to pick a location"
+            className="transition-transform hover:scale-[1.08] active:scale-95"
+            style={{ ...planetButtonStyle, cursor: 'pointer', appearance: 'none' }}
+          >
+            <Globe size={22} style={{ color: '#8fd0ff' }} />
+          </button>
+        </div>
       ) : (
         <span />
       )}
