@@ -2,7 +2,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import type { TimeBlockData } from '@/services/timeBlock/types';
 import { WeatherIcon } from '@/components/weather/WeatherIcon';
 import { Droplets, Snowflake, Wind, Sun } from 'lucide-react';
-import { getClothingIcon } from '@/services/clothing/clothingIconMap';
+import { getClothingIcon, SUN_PROTECTION_COLOR } from '@/services/clothing/clothingIconMap';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getTimeBlockLabel, translateClothingItem } from './timeBlockLabels';
 import { getTempDisplay } from './tempDisplay';
@@ -159,19 +159,39 @@ export function ClockTimeBlockCard({ data }: ClockTimeBlockCardProps) {
                     title={translateClothingItem(t, item.id)}
                   >
                     {iconUrl ? (
-                      <img
-                        src={iconUrl}
-                        alt={item.name}
-                        className="flex-shrink-0"
-                        style={{
-                          width: '2.5rem',
-                          height: '2.5rem',
-                          objectFit: 'contain',
-                          opacity: 0.8,
-                          filter:
-                            'brightness(0) saturate(100%) invert(60%) sepia(80%) saturate(2000%) hue-rotate(5deg) brightness(105%) contrast(102%)',
-                        }}
-                      />
+                      item.category === 'sun-protection' ? (
+                        <div
+                          className="flex-shrink-0"
+                          style={{
+                            width: '2.5rem',
+                            height: '2.5rem',
+                            opacity: 0.9,
+                            backgroundColor: SUN_PROTECTION_COLOR,
+                            WebkitMaskImage: `url(${iconUrl})`,
+                            maskImage: `url(${iconUrl})`,
+                            WebkitMaskRepeat: 'no-repeat',
+                            maskRepeat: 'no-repeat',
+                            WebkitMaskPosition: 'center',
+                            maskPosition: 'center',
+                            WebkitMaskSize: 'contain',
+                            maskSize: 'contain',
+                          }}
+                        />
+                      ) : (
+                        <img
+                          src={iconUrl}
+                          alt={item.name}
+                          className="flex-shrink-0"
+                          style={{
+                            width: '2.5rem',
+                            height: '2.5rem',
+                            objectFit: 'contain',
+                            opacity: 0.8,
+                            filter:
+                              'brightness(0) saturate(100%) invert(60%) sepia(80%) saturate(2000%) hue-rotate(5deg) brightness(105%) contrast(102%)',
+                          }}
+                        />
+                      )
                     ) : (
                       <div
                         className="rounded-full bg-[#ff6b00]/20 flex-shrink-0"

@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/dialog';
 import type { TimeBlockData } from '@/services/timeBlock/types';
 import { WeatherIcon } from '@/components/weather/WeatherIcon';
-import { getClothingIcon } from '@/services/clothing/clothingIconMap';
+import { getClothingIcon, SUN_PROTECTION_COLOR } from '@/services/clothing/clothingIconMap';
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
   getTimeBlockLabel,
@@ -270,6 +270,7 @@ export function TimeBlockDetailDialog({ block, onClose }: TimeBlockDetailDialogP
                   {block.clothingItems.map((item, index) => {
                     const iconFilename = getClothingIcon(item.id);
                     const iconUrl = iconFilename ? getClothingIconUrl(iconFilename) : undefined;
+                    const isSun = item.category === 'sun-protection';
                     return (
                       <div
                         key={`${item.id}-${index}`}
@@ -281,21 +282,41 @@ export function TimeBlockDetailDialog({ block, onClose }: TimeBlockDetailDialogP
                           style={{
                             width: '60px',
                             height: '60px',
-                            background: 'rgba(255, 107, 0, 0.08)',
-                            border: '1px solid rgba(255, 107, 0, 0.2)',
+                            background: isSun ? 'rgba(242, 201, 76, 0.10)' : 'rgba(255, 107, 0, 0.08)',
+                            border: isSun
+                              ? '1px solid rgba(242, 201, 76, 0.28)'
+                              : '1px solid rgba(255, 107, 0, 0.2)',
                           }}
                         >
                           {iconUrl ? (
-                            <img
-                              src={iconUrl}
-                              alt={item.name}
-                              style={{
-                                width: '2.25rem',
-                                height: '2.25rem',
-                                objectFit: 'contain',
-                                filter: clothingIconFilter,
-                              }}
-                            />
+                            isSun ? (
+                              <div
+                                style={{
+                                  width: '2.25rem',
+                                  height: '2.25rem',
+                                  backgroundColor: SUN_PROTECTION_COLOR,
+                                  WebkitMaskImage: `url(${iconUrl})`,
+                                  maskImage: `url(${iconUrl})`,
+                                  WebkitMaskRepeat: 'no-repeat',
+                                  maskRepeat: 'no-repeat',
+                                  WebkitMaskPosition: 'center',
+                                  maskPosition: 'center',
+                                  WebkitMaskSize: 'contain',
+                                  maskSize: 'contain',
+                                }}
+                              />
+                            ) : (
+                              <img
+                                src={iconUrl}
+                                alt={item.name}
+                                style={{
+                                  width: '2.25rem',
+                                  height: '2.25rem',
+                                  objectFit: 'contain',
+                                  filter: clothingIconFilter,
+                                }}
+                              />
+                            )
                           ) : (
                             <div
                               className="rounded-full"

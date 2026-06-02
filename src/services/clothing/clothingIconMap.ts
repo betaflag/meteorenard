@@ -3,6 +3,9 @@
  * Icons are located in src/assets/clothing/
  */
 
+/** Tint for sun-protection items (sunscreen), set apart from the clothing orange. */
+export const SUN_PROTECTION_COLOR = '#F2C94C';
+
 export const CLOTHING_ICON_MAP: Record<string, string> = {
   // Below 0°C - Full winter gear
   'winter-hat': 'tuque.png',
