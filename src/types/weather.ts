@@ -42,4 +42,7 @@ export interface WeatherData {
   current: CurrentWeather;
   hourly: HourlyWeather[];
   daily: DailyWeather[];
+  // Sunrise/sunset ISO datetimes starting today (provider may omit them)
+  sunrise?: string[];
+  sunset?: string[];
 }

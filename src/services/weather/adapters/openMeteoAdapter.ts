@@ -139,5 +139,7 @@ export function adaptOpenMeteoResponse(
     },
     hourly: hourlyData,
     daily: dailyData,
+    sunrise: response.daily.sunrise,
+    sunset: response.daily.sunset,
   };
 }

@@ -4,6 +4,7 @@ import { ClockTimeBlockCard } from '@/components/clock/ClockTimeBlockCard';
 import { WeatherEffects } from '@/components/clock/WeatherEffects';
 import { TimeBlockDetailDialog } from '@/components/clock/TimeBlockDetailDialog';
 import { CurrentWeatherWidget } from '@/components/clock/CurrentWeatherWidget';
+import { HourlyTimeline } from '@/components/clock/HourlyTimeline';
 import { LocationPermissionDialog } from '@/components/location/LocationPermissionDialog';
 import { CitySearchDialog } from '@/components/location/CitySearchDialog';
 import { TimeBlockService } from '@/services/timeBlock/TimeBlockService';
@@ -163,16 +164,18 @@ export function ClockPage() {
   };
 
   return (
-    <div
-      className="fixed inset-0 overflow-hidden cursor-pointer"
-      style={{
-        backgroundImage: `url(${backgroundImage})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-      }}
-      onClick={handleBackgroundChange}
-    >
+    <div className="fixed inset-0 overflow-hidden flex flex-col" style={{ background: '#0e111c' }}>
+      {/* Photo scene region — everything except the solid bottom timeline bar */}
+      <div
+        className="relative flex-1 overflow-hidden cursor-pointer"
+        style={{
+          backgroundImage: `url(${backgroundImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}
+        onClick={handleBackgroundChange}
+      >
       {/* Dark overlay for better text readability */}
       <div
         className="absolute inset-0"
@@ -221,7 +224,7 @@ export function ClockPage() {
           <div
             className="flex-shrink-0"
             style={{
-              padding: '0 40px 40px 40px',
+              padding: '0 40px 16px 40px',
               background: 'linear-gradient(to top, rgba(0, 0, 0, 0.3) 0%, transparent 100%)',
             }}
           >
@@ -253,7 +256,21 @@ export function ClockPage() {
             </div>
           </div>
         )}
+        </div>
       </div>
+
+      {/* Solid full-width bottom bar with the next-24h timeline (no photo behind) */}
+      {currentLocation && weatherData && (
+        <div
+          className="flex-shrink-0"
+          style={{
+            background: '#0e111c',
+            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+          }}
+        >
+          <HourlyTimeline weather={weatherData} />
+        </div>
+      )}
 
       {/* Location Permission Dialog (First Visit) */}
       <LocationPermissionDialog

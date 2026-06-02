@@ -30,6 +30,8 @@ export interface OpenMeteoResponse {
     temperature_2m_min: number[];
     weathercode: number[];
     precipitation_probability_max: number[];
+    sunrise: string[];
+    sunset: string[];
   };
 }
 

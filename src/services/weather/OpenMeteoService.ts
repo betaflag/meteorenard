@@ -19,7 +19,7 @@ export class OpenMeteoService implements IWeatherService {
         longitude: location.longitude.toString(),
         current_weather: 'true',
         hourly: 'temperature_2m,weathercode,apparent_temperature,relativehumidity_2m,windspeed_10m,precipitation_probability,precipitation,uv_index',
-        daily: 'temperature_2m_max,temperature_2m_min,weathercode,precipitation_probability_max',
+        daily: 'temperature_2m_max,temperature_2m_min,weathercode,precipitation_probability_max,sunrise,sunset',
         timezone: 'auto',
         forecast_days: '10',
       });
