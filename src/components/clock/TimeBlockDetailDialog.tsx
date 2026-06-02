@@ -13,6 +13,7 @@ import {
   getTimeBlockLabel,
   translateClothingItem,
   translateCondition,
+  translateUvLevel,
 } from './timeBlockLabels';
 import {
   Droplet,
@@ -21,6 +22,7 @@ import {
   Wind,
   Thermometer,
   ChevronsUpDown,
+  Sun,
   X,
 } from 'lucide-react';
 
@@ -204,6 +206,13 @@ export function TimeBlockDetailDialog({ block, onClose }: TimeBlockDetailDialogP
                     icon={<Droplet size={22} />}
                     label={t.timeBlockDetail.humidity}
                     value={`${Math.round(block.humidity)}%`}
+                  />
+                )}
+                {block.uvIndex !== undefined && (
+                  <Metric
+                    icon={<Sun size={22} />}
+                    label={t.timeBlockDetail.uvIndex}
+                    value={`${Math.round(block.uvIndex)} · ${translateUvLevel(t, block.uvIndex)}`}
                   />
                 )}
               </div>

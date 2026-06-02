@@ -18,6 +18,7 @@ export interface HourlyWeather {
   windSpeed?: number;
   precipitationProbability?: number;
   precipitation?: number; // in mm
+  uvIndex?: number;
 }
 
 export interface CurrentWeather {

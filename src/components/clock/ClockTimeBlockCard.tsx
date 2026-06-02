@@ -1,7 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import type { TimeBlockData } from '@/services/timeBlock/types';
 import { WeatherIcon } from '@/components/weather/WeatherIcon';
-import { Droplets, Snowflake, Wind } from 'lucide-react';
+import { Droplets, Snowflake, Wind, Sun } from 'lucide-react';
 import { getClothingIcon } from '@/services/clothing/clothingIconMap';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getTimeBlockLabel, translateClothingItem } from './timeBlockLabels';
@@ -30,12 +30,21 @@ export function ClockTimeBlockCard({ data }: ClockTimeBlockCardProps) {
     condition,
     precipitationProbability,
     snowAccumulation,
+    uvIndex,
     clothingItems,
     isNextDay,
   } = data;
 
-  // Show top 4 clothing items for more compact display
-  const displayItems = clothingItems.slice(0, 4);
+  // Show up to 4 clothing items for a compact display. When sunscreen is
+  // recommended (high UV), keep it visible even if it would fall outside the
+  // first four by swapping it into the last slot.
+  const MAX_ITEMS = 4;
+  const topItems = clothingItems.slice(0, MAX_ITEMS);
+  const sunscreen = clothingItems.find((item) => item.id === 'sunscreen');
+  const displayItems =
+    sunscreen && !topItems.some((item) => item.id === 'sunscreen')
+      ? [...clothingItems.filter((item) => item.id !== 'sunscreen').slice(0, MAX_ITEMS - 1), sunscreen]
+      : topItems;
   const translatedLabel = getTimeBlockLabel(t, period, isNextDay);
   const temp = getTempDisplay(temperature, feelsLike);
 
@@ -44,7 +53,10 @@ export function ClockTimeBlockCard({ data }: ClockTimeBlockCardProps) {
   const precipPercent =
     precipitationProbability !== undefined ? Math.round(precipitationProbability) : 0;
   const showPrecip = !showSnow && precipPercent > 0;
-  const hasSecondary = temp.showActual || showSnow || showPrecip;
+  // Surface UV on the card only when sun protection is warranted (UV >= 3),
+  // matching the threshold that adds sunscreen to the clothing line.
+  const uvDisplay = uvIndex !== undefined && uvIndex >= 3 ? Math.round(uvIndex) : null;
+  const hasSecondary = temp.showActual || showSnow || showPrecip || uvDisplay !== null;
 
   return (
     <Card
@@ -122,6 +134,12 @@ export function ClockTimeBlockCard({ data }: ClockTimeBlockCardProps) {
                       {precipPercent}%
                     </span>
                   )
+                )}
+                {uvDisplay !== null && (
+                  <span className="flex items-center" style={{ gap: '4px', fontSize: '1rem', color: '#C5A572' }}>
+                    <Sun size={16} />
+                    UV {uvDisplay}
+                  </span>
                 )}
               </div>
             )}

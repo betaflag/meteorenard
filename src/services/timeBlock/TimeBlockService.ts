@@ -2,6 +2,7 @@ import type { WeatherData, HourlyWeather, WeatherCondition } from '@/types/weath
 import type { TimeBlockConfig, TimeBlockData } from './types';
 import { TimeBlockPeriod as Period } from './types';
 import { ClothingRecommendationService } from '../clothing/ClothingRecommendationService';
+import type { ClothingItem } from '../clothing/types';
 
 /**
  * Aggregated weather for a time block, including the hourly entries it was derived from.
@@ -16,6 +17,7 @@ interface BlockWeather {
   humidity?: number;
   tempHigh: number;
   tempLow: number;
+  uvIndex?: number;
   hours: HourlyWeather[];
 }
 
@@ -57,6 +59,34 @@ interface TimeBlockInstance {
  * Service for managing time blocks and weather-based clothing recommendations
  */
 export class TimeBlockService {
+  /**
+   * UV index at or above which sun protection is recommended (Health Canada /
+   * WHO guidance). Drives the sunscreen recommendation independently of
+   * temperature, so a cool but sunny day still suggests it.
+   */
+  private static readonly SUNSCREEN_UV_THRESHOLD = 3;
+
+  private static readonly SUNSCREEN_ITEM: ClothingItem = {
+    id: 'sunscreen',
+    name: 'Sunscreen',
+    category: 'sun-protection',
+  };
+
+  /**
+   * Add sunscreen to a clothing list when the block's peak UV warrants it and
+   * it isn't already recommended. Returns a new array only when injecting, so
+   * the shared recommendation arrays are never mutated.
+   */
+  private static applySunProtection(items: ClothingItem[], uvIndex?: number): ClothingItem[] {
+    if (uvIndex === undefined || uvIndex < this.SUNSCREEN_UV_THRESHOLD) {
+      return items;
+    }
+    if (items.some((item) => item.id === 'sunscreen')) {
+      return items;
+    }
+    return [...items, this.SUNSCREEN_ITEM];
+  }
+
   /**
    * Build the next `count` time blocks as concrete date ranges starting from `now`.
    *
@@ -153,6 +183,13 @@ export class TimeBlockService {
     const windSpeed = average((h) => h.windSpeed);
     const humidity = average((h) => h.humidity);
 
+    // Peak (not average) UV: sun protection is driven by the strongest exposure
+    // during the block, not its mean.
+    const uvVals = relevantData
+      .map((h) => h.uvIndex)
+      .filter((v): v is number => v !== undefined);
+    const uvIndex = uvVals.length > 0 ? Math.max(...uvVals) : undefined;
+
     let snowAccumulation: number | undefined;
     if (condition === 'snow') {
       const snowVals = relevantData
@@ -175,6 +212,7 @@ export class TimeBlockService {
       humidity,
       tempHigh,
       tempLow,
+      uvIndex,
       hours: relevantData,
     };
   }
@@ -242,7 +280,8 @@ export class TimeBlockService {
       precipitationProbability = estimate.precipitationProbability;
     }
 
-    const clothingItems = ClothingRecommendationService.getRecommendations(temperature, preschoolMode);
+    const baseClothing = ClothingRecommendationService.getRecommendations(temperature, preschoolMode);
+    const clothingItems = this.applySunProtection(baseClothing, avgWeather?.uvIndex);
 
     return {
       period: config.period,
@@ -260,6 +299,7 @@ export class TimeBlockService {
       humidity: avgWeather?.humidity,
       tempHigh: avgWeather?.tempHigh,
       tempLow: avgWeather?.tempLow,
+      uvIndex: avgWeather?.uvIndex,
       hours: avgWeather?.hours ?? [],
     };
   }

@@ -43,11 +43,21 @@ export interface Translations {
     low: string;
     wind: string;
     humidity: string;
+    uvIndex: string;
     precipitationChance: string;
     snow: string;
     hourlyForecast: string;
     recommendedClothing: string;
     close: string;
+  };
+
+  // WHO UV index exposure levels
+  uvLevels: {
+    low: string;
+    moderate: string;
+    high: string;
+    veryHigh: string;
+    extreme: string;
   };
 
   // Short labels for our 8 normalized weather conditions

@@ -22,6 +22,7 @@ export interface OpenMeteoResponse {
     windspeed_10m: number[];
     precipitation_probability: number[];
     precipitation: number[];
+    uv_index: number[];
   };
   daily: {
     time: string[];

@@ -39,11 +39,20 @@ const en: Translations = {
     low: 'Low',
     wind: 'Wind',
     humidity: 'Humidity',
+    uvIndex: 'UV index',
     precipitationChance: 'Chance of precipitation',
     snow: 'Snow',
     hourlyForecast: 'Hourly forecast',
     recommendedClothing: 'Recommended clothing',
     close: 'Close',
+  },
+
+  uvLevels: {
+    low: 'Low',
+    moderate: 'Moderate',
+    high: 'High',
+    veryHigh: 'Very high',
+    extreme: 'Extreme',
   },
 
   conditions: {
@@ -169,11 +178,20 @@ const fr: Translations = {
     low: 'Min',
     wind: 'Vent',
     humidity: 'Humidité',
+    uvIndex: 'Indice UV',
     precipitationChance: 'Probabilité de précipitations',
     snow: 'Neige',
     hourlyForecast: 'Prévisions horaires',
     recommendedClothing: 'Vêtements recommandés',
     close: 'Fermer',
+  },
+
+  uvLevels: {
+    low: 'Faible',
+    moderate: 'Modéré',
+    high: 'Élevé',
+    veryHigh: 'Très élevé',
+    extreme: 'Extrême',
   },
 
   conditions: {

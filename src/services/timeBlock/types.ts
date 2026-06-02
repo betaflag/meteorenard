@@ -42,5 +42,6 @@ export interface TimeBlockData {
   humidity?: number;
   tempHigh?: number;
   tempLow?: number;
+  uvIndex?: number; // Peak UV index across the block
   hours: HourlyWeather[]; // Hourly forecasts within the block ([] when none matched)
 }

@@ -98,6 +98,7 @@ export function adaptOpenMeteoResponse(
       windSpeed: Math.round(response.hourly.windspeed_10m[index]),
       precipitationProbability: response.hourly.precipitation_probability[index],
       precipitation: response.hourly.precipitation[index],
+      uvIndex: response.hourly.uv_index[index],
     }))
     .filter((hour) => new Date(hour.time) >= now);
 
@@ -111,6 +112,7 @@ export function adaptOpenMeteoResponse(
     windSpeed: hour.windSpeed,
     precipitationProbability: hour.precipitationProbability,
     precipitation: hour.precipitation,
+    uvIndex: hour.uvIndex,
   }));
 
   // Get 10-day daily forecast (skip today, start from tomorrow)

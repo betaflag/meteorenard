@@ -66,6 +66,18 @@ export function getTimeBlockLabel(
 }
 
 /**
+ * Translated WHO exposure level for a UV index value (Low / Moderate / High /
+ * Very high / Extreme).
+ */
+export function translateUvLevel(t: Translations, uvIndex: number): string {
+  if (uvIndex < 3) return t.uvLevels.low;
+  if (uvIndex < 6) return t.uvLevels.moderate;
+  if (uvIndex < 8) return t.uvLevels.high;
+  if (uvIndex < 11) return t.uvLevels.veryHigh;
+  return t.uvLevels.extreme;
+}
+
+/**
  * Translated label for one of the 8 normalized weather conditions.
  */
 export function translateCondition(t: Translations, condition: WeatherCondition): string {

@@ -18,7 +18,7 @@ export class OpenMeteoService implements IWeatherService {
         latitude: location.latitude.toString(),
         longitude: location.longitude.toString(),
         current_weather: 'true',
-        hourly: 'temperature_2m,weathercode,apparent_temperature,relativehumidity_2m,windspeed_10m,precipitation_probability,precipitation',
+        hourly: 'temperature_2m,weathercode,apparent_temperature,relativehumidity_2m,windspeed_10m,precipitation_probability,precipitation,uv_index',
         daily: 'temperature_2m_max,temperature_2m_min,weathercode,precipitation_probability_max',
         timezone: 'auto',
         forecast_days: '10',
