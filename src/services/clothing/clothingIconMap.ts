@@ -40,13 +40,11 @@ export const CLOTHING_ICON_MAP: Record<string, string> = {
   // 18 to 22°C - Light long sleeves
   'light-long-sleeve': 't-shirt-manches-longues.png',
   'light-pants': 'pantalon-leger.png',
-  'outdoor-shoes-2': 'espadrilles.png',
 
   // 22°C and above - Summer clothing
   'cap-hat': 'casquette.png',
   'short-sleeve': 't-shirt-leger.png',
   'shorts-skirt': 'short.png',
-  'outdoor-shoes-3': 'espadrilles.png',
   'sunscreen': 'creme-solaire.png',
 
   // Weather-driven extras (injected by condition, not temperature tier)

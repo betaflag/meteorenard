@@ -1,12 +1,13 @@
 import type { Translations } from '@/types/i18n';
 import type { WeatherCondition } from '@/types/weather';
+import type { ClothingItem } from '@/services/clothing/types';
 import { TimeBlockPeriod } from '@/services/timeBlock/types';
 
 /**
- * Map a clothing item id to its translated, human-readable name.
- * Falls back to the raw id when no translation key is registered.
+ * Translated, human-readable name for a clothing item. Falls back to the item's
+ * English name (never the raw id) if no translation key is registered.
  */
-export function translateClothingItem(t: Translations, itemId: string): string {
+export function translateClothingItem(t: Translations, item: ClothingItem): string {
   const idToKeyMap: Record<string, keyof typeof t.clothing> = {
     'winter-hat': 'winterHat',
     'neck-warmer': 'neckWarmer',
@@ -22,17 +23,17 @@ export function translateClothingItem(t: Translations, itemId: string): string {
     'light-coat-vest': 'lightJacketVest',
     'casual-pants': 'casualPants',
     'outdoor-shoes': 'outdoorShoes',
-    'long-sleeve-shirt': 'lightLongSleeve',
+    'light-long-sleeve': 'lightLongSleeve',
     'light-pants': 'lightPants',
     'cap-hat': 'capHat',
-    'short-sleeve-shirt': 'shortSleeve',
+    'short-sleeve': 'shortSleeve',
     'shorts-skirt': 'shortsSkirt',
     sunscreen: 'sunscreen',
     umbrella: 'umbrella',
   };
 
-  const translationKey = idToKeyMap[itemId];
-  return translationKey ? t.clothing[translationKey] : itemId;
+  const translationKey = idToKeyMap[item.id];
+  return translationKey ? t.clothing[translationKey] : item.name;
 }
 
 /**

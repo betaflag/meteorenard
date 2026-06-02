@@ -326,7 +326,7 @@ export function TimeBlockDetailDialog({ block, onClose }: TimeBlockDetailDialogP
                           className="text-[#e5e7eb] text-center leading-tight"
                           style={{ fontSize: '0.85rem' }}
                         >
-                          {translateClothingItem(t, item.id)}
+                          {translateClothingItem(t, item)}
                         </span>
                       </div>
                     );

@@ -71,7 +71,7 @@ export const CLOTHING_RECOMMENDATIONS: readonly ClothingRecommendation[] = [
       },
       { id: "light-pants", name: "Light pants", category: "pants" },
       {
-        id: "outdoor-shoes-2",
+        id: "outdoor-shoes",
         name: "Outdoor shoes",
         category: "footwear",
       },
@@ -90,11 +90,12 @@ export const CLOTHING_RECOMMENDATIONS: readonly ClothingRecommendation[] = [
       },
       { id: "shorts-skirt", name: "Shorts/skirt", category: "pants" },
       {
-        id: "outdoor-shoes-3",
+        id: "outdoor-shoes",
         name: "Outdoor shoes",
         category: "footwear",
       },
-      { id: "sunscreen", name: "Sunscreen", category: "sun-protection" },
+      // Sunscreen is added by UV (see TimeBlockService.applySunProtection),
+      // not hardcoded here — so a hot but overcast/low-UV day won't show it.
     ],
   },
 ] as const;

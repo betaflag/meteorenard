@@ -156,7 +156,7 @@ export function ClockTimeBlockCard({ data }: ClockTimeBlockCardProps) {
                   <div
                     key={`${item.id}-${index}`}
                     className="flex flex-col items-center"
-                    title={translateClothingItem(t, item.id)}
+                    title={translateClothingItem(t, item)}
                   >
                     {iconUrl ? (
                       tint ? (
