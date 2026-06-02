@@ -35,13 +35,6 @@ export const CLOTHING_ICON_MAP: Record<string, string> = {
   'shorts-skirt': 'short.png',
   'outdoor-shoes-3': 'espadrilles.png',
   'sunscreen': 'creme-solaire.png',
-
-  // Additional items for special conditions
-  'raincoat': 'imperméable.png',
-  'windbreaker': 'coupe-vent.png',
-  'sweater': 'chandail.png',
-  'light-sweater': 'chandail-leger.png',
-  'polo': 'polo.png',
 };
 
 /**
