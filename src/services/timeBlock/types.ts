@@ -1,4 +1,4 @@
-import type { WeatherCondition } from '@/types/weather';
+import type { WeatherCondition, HourlyWeather } from '@/types/weather';
 import type { ClothingItem } from '@/services/clothing/types';
 
 /**
@@ -30,10 +30,17 @@ export interface TimeBlockData {
   label: string; // e.g., "8h-12h"
   startHour: number;
   endHour: number;
-  temperature: number; // Temperature at start of block
+  temperature: number; // Average temperature across the block
   condition: WeatherCondition;
   precipitationProbability?: number;
   snowAccumulation?: number; // Snow accumulation in cm
   clothingItems: ClothingItem[]; // Recommended clothing
   isNextDay: boolean; // Whether this block is for tomorrow
+  // Detail fields derived from the block's hourly data (absent on daily-estimate fallback)
+  feelsLike?: number;
+  windSpeed?: number;
+  humidity?: number;
+  tempHigh?: number;
+  tempLow?: number;
+  hours: HourlyWeather[]; // Hourly forecasts within the block ([] when none matched)
 }

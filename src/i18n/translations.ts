@@ -32,6 +32,30 @@ const en: Translations = {
     tomorrow: 'Tomorrow',
   },
 
+  timeBlockDetail: {
+    feelsLike: 'Feels like',
+    high: 'High',
+    low: 'Low',
+    wind: 'Wind',
+    humidity: 'Humidity',
+    precipitationChance: 'Chance of precipitation',
+    snow: 'Snow',
+    hourlyForecast: 'Hourly forecast',
+    recommendedClothing: 'Recommended clothing',
+    close: 'Close',
+  },
+
+  conditions: {
+    clear: 'Clear',
+    partlyCloudy: 'Partly cloudy',
+    cloudy: 'Cloudy',
+    rain: 'Rain',
+    heavyRain: 'Heavy rain',
+    thunderstorm: 'Thunderstorm',
+    snow: 'Snow',
+    fog: 'Fog',
+  },
+
   providers: {
     openMeteo: {
       label: 'Open-Meteo',
@@ -135,6 +159,30 @@ const fr: Translations = {
     afternoon: 'Après-midi (12h-17h)',
     evening: 'Soirée (18h-22h)',
     tomorrow: 'Demain',
+  },
+
+  timeBlockDetail: {
+    feelsLike: 'Ressenti',
+    high: 'Max',
+    low: 'Min',
+    wind: 'Vent',
+    humidity: 'Humidité',
+    precipitationChance: 'Probabilité de précipitations',
+    snow: 'Neige',
+    hourlyForecast: 'Prévisions horaires',
+    recommendedClothing: 'Vêtements recommandés',
+    close: 'Fermer',
+  },
+
+  conditions: {
+    clear: 'Dégagé',
+    partlyCloudy: 'Partiellement nuageux',
+    cloudy: 'Nuageux',
+    rain: 'Pluie',
+    heavyRain: 'Forte pluie',
+    thunderstorm: 'Orage',
+    snow: 'Neige',
+    fog: 'Brouillard',
   },
 
   providers: {

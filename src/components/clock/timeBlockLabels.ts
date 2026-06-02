@@ -1,0 +1,83 @@
+import type { Translations } from '@/types/i18n';
+import type { WeatherCondition } from '@/types/weather';
+import { TimeBlockPeriod } from '@/services/timeBlock/types';
+
+/**
+ * Map a clothing item id to its translated, human-readable name.
+ * Falls back to the raw id when no translation key is registered.
+ */
+export function translateClothingItem(t: Translations, itemId: string): string {
+  const idToKeyMap: Record<string, keyof typeof t.clothing> = {
+    'winter-hat': 'winterHat',
+    'neck-warmer': 'neckWarmer',
+    'mittens-gloves': 'mittensGloves',
+    'winter-coat': 'winterCoat',
+    'snow-pants': 'snowPants',
+    'winter-boots': 'winterBoots',
+    'thin-hat': 'lightHat',
+    'thin-gloves': 'lightGloves',
+    'mid-season-coat': 'midSeasonJacket',
+    'mid-season-pants': 'regularPants',
+    'rain-winter-boots': 'winterRainBoots',
+    'light-coat-vest': 'lightJacketVest',
+    'casual-pants': 'casualPants',
+    'outdoor-shoes': 'outdoorShoes',
+    'long-sleeve-shirt': 'lightLongSleeve',
+    'light-pants': 'lightPants',
+    'cap-hat': 'capHat',
+    'short-sleeve-shirt': 'shortSleeve',
+    'shorts-skirt': 'shortsSkirt',
+    sunscreen: 'sunscreen',
+  };
+
+  const translationKey = idToKeyMap[itemId];
+  return translationKey ? t.clothing[translationKey] : itemId;
+}
+
+/**
+ * Short period label (e.g. "Morning"), prefixed with "Tomorrow" when the block
+ * is for the next day.
+ */
+export function getTimeBlockLabel(
+  t: Translations,
+  period: TimeBlockPeriod,
+  isNextDay: boolean
+): string {
+  let periodName = '';
+  switch (period) {
+    case TimeBlockPeriod.MORNING:
+      periodName = t.timeBlocks.morning.split(' ')[0];
+      break;
+    case TimeBlockPeriod.AFTERNOON:
+      periodName = t.timeBlocks.afternoon.split(' ')[0];
+      break;
+    case TimeBlockPeriod.EVENING:
+      periodName = t.timeBlocks.evening.split(' ')[0];
+      break;
+    default:
+      return '';
+  }
+
+  if (isNextDay) {
+    return `${t.timeBlocks.tomorrow} ${periodName.toLowerCase()}`;
+  }
+
+  return periodName;
+}
+
+/**
+ * Translated label for one of the 8 normalized weather conditions.
+ */
+export function translateCondition(t: Translations, condition: WeatherCondition): string {
+  const map: Record<WeatherCondition, keyof typeof t.conditions> = {
+    clear: 'clear',
+    'partly-cloudy': 'partlyCloudy',
+    cloudy: 'cloudy',
+    rain: 'rain',
+    'heavy-rain': 'heavyRain',
+    thunderstorm: 'thunderstorm',
+    snow: 'snow',
+    fog: 'fog',
+  };
+  return t.conditions[map[condition]];
+}

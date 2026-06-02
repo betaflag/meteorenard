@@ -4,6 +4,22 @@ import { TimeBlockPeriod as Period } from './types';
 import { ClothingRecommendationService } from '../clothing/ClothingRecommendationService';
 
 /**
+ * Aggregated weather for a time block, including the hourly entries it was derived from.
+ */
+interface BlockWeather {
+  temp: number;
+  condition: WeatherCondition;
+  precipitationProbability?: number;
+  snowAccumulation?: number;
+  feelsLike?: number;
+  windSpeed?: number;
+  humidity?: number;
+  tempHigh: number;
+  tempLow: number;
+  hours: HourlyWeather[];
+}
+
+/**
  * Time block configurations
  */
 const TIME_BLOCKS: TimeBlockConfig[] = [
@@ -106,7 +122,7 @@ export class TimeBlockService {
     hourlyData: HourlyWeather[],
     start: Date,
     end: Date
-  ): { temp: number; condition: WeatherCondition; precipitationProbability?: number; snowAccumulation?: number } | null {
+  ): BlockWeather | null {
     const startMs = start.getTime();
     const endMs = end.getTime();
 
@@ -121,16 +137,21 @@ export class TimeBlockService {
     }
 
     const avgTemp = relevantData.reduce((sum, h) => sum + h.temp, 0) / relevantData.length;
+    const tempHigh = Math.max(...relevantData.map((h) => h.temp));
+    const tempLow = Math.min(...relevantData.map((h) => h.temp));
 
     // Use the first hour's condition as representative of the block
     const condition = relevantData[0].condition;
 
-    const precipVals = relevantData
-      .map((h) => h.precipitationProbability)
-      .filter((p): p is number => p !== undefined);
-    const precipitationProbability = precipVals.length > 0
-      ? precipVals.reduce((sum, p) => sum + p, 0) / precipVals.length
-      : undefined;
+    const average = (pick: (h: HourlyWeather) => number | undefined): number | undefined => {
+      const vals = relevantData.map(pick).filter((v): v is number => v !== undefined);
+      return vals.length > 0 ? vals.reduce((sum, v) => sum + v, 0) / vals.length : undefined;
+    };
+
+    const precipitationProbability = average((h) => h.precipitationProbability);
+    const feelsLike = average((h) => h.feelsLike);
+    const windSpeed = average((h) => h.windSpeed);
+    const humidity = average((h) => h.humidity);
 
     let snowAccumulation: number | undefined;
     if (condition === 'snow') {
@@ -149,6 +170,12 @@ export class TimeBlockService {
       condition,
       precipitationProbability,
       snowAccumulation,
+      feelsLike,
+      windSpeed,
+      humidity,
+      tempHigh,
+      tempLow,
+      hours: relevantData,
     };
   }
 
@@ -228,6 +255,12 @@ export class TimeBlockService {
       snowAccumulation,
       clothingItems,
       isNextDay,
+      feelsLike: avgWeather?.feelsLike,
+      windSpeed: avgWeather?.windSpeed,
+      humidity: avgWeather?.humidity,
+      tempHigh: avgWeather?.tempHigh,
+      tempLow: avgWeather?.tempLow,
+      hours: avgWeather?.hours ?? [],
     };
   }
 

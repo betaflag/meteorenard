@@ -2,20 +2,21 @@ import { useState, useEffect, useCallback } from 'react';
 import { ClockDisplay } from '@/components/clock/ClockDisplay';
 import { ClockTimeBlockCard } from '@/components/clock/ClockTimeBlockCard';
 import { WeatherEffects } from '@/components/clock/WeatherEffects';
+import { TimeBlockDetailDialog } from '@/components/clock/TimeBlockDetailDialog';
 import { LocationPermissionDialog } from '@/components/location/LocationPermissionDialog';
 import { CitySearchDialog } from '@/components/location/CitySearchDialog';
 import { TimeBlockService } from '@/services/timeBlock/TimeBlockService';
 import { WeatherServiceFactory } from '@/services/weather/WeatherServiceFactory';
 import { LocationStorageService } from '@/services/location/LocationStorageService';
 import type { WeatherData } from '@/types/weather';
+import type { TimeBlockData } from '@/services/timeBlock/types';
 import type { Location } from '@/types/location';
 
 // Background images are organised by season and time of day. Each season/period
 // folder holds 5 variants (e.g. summer/morning/morning-1.jpg).
-const SEASONS = ['winter', 'summer'] as const;
 const PERIODS = ['morning', 'afternoon', 'evening', 'night'] as const;
 
-type Season = typeof SEASONS[number];
+type Season = 'winter' | 'summer';
 type TimePeriod = typeof PERIODS[number];
 
 const buildPeriodBackgrounds = (season: Season): Record<TimePeriod, string[]> =>
@@ -72,7 +73,7 @@ export function ClockPage() {
   const [backgroundImage, setBackgroundImage] = useState<string>(() => getRandomBackground());
   const [showLocationPermissionDialog, setShowLocationPermissionDialog] = useState(false);
   const [showCitySearchDialog, setShowCitySearchDialog] = useState(false);
-  const [forcedWeatherEffect, setForcedWeatherEffect] = useState<'rain' | 'snow' | null>(null);
+  const [selectedBlock, setSelectedBlock] = useState<TimeBlockData | null>(null);
 
   const fetchWeatherData = useCallback(async (location: Location) => {
     try {
@@ -145,16 +146,9 @@ export function ClockPage() {
   // Get the next time block's weather condition for effects
   const nextBlockCondition = timeBlocks.length > 0 ? timeBlocks[0].condition : null;
 
-  // Handle clicking a time block to test weather effects
-  const handleTimeBlockClick = useCallback((block: typeof timeBlocks[0]) => {
-    // If block has snow accumulation, show snow effect
-    if (block.snowAccumulation && block.snowAccumulation > 0) {
-      setForcedWeatherEffect(prev => prev === 'snow' ? null : 'snow');
-    }
-    // If block has precipitation probability, show rain effect
-    else if (block.precipitationProbability && block.precipitationProbability > 0) {
-      setForcedWeatherEffect(prev => prev === 'rain' ? null : 'rain');
-    }
+  // Handle clicking a time block to open its detail modal
+  const handleTimeBlockClick = useCallback((block: TimeBlockData) => {
+    setSelectedBlock(block);
   }, []);
 
   // Handle tap/click to change background
@@ -186,10 +180,8 @@ export function ClockPage() {
         }}
       />
 
-      {/* Weather effects (rain/snow) */}
-      {(forcedWeatherEffect || nextBlockCondition) && (
-        <WeatherEffects condition={(forcedWeatherEffect || nextBlockCondition)!} />
-      )}
+      {/* Ambient weather effects (rain/snow) for the upcoming block */}
+      {nextBlockCondition && <WeatherEffects condition={nextBlockCondition} />}
 
       {/* Main Layout Container - Optimized for 1920x1200 */}
       <div
@@ -242,10 +234,7 @@ export function ClockPage() {
                   }}
                   style={{
                     height: '280px', // Fixed height for consistency
-                    cursor: (block.snowAccumulation && block.snowAccumulation > 0) ||
-                            (block.precipitationProbability && block.precipitationProbability > 0)
-                      ? 'pointer'
-                      : 'default',
+                    cursor: 'pointer',
                   }}
                 >
                   <ClockTimeBlockCard data={block} />
@@ -269,6 +258,9 @@ export function ClockPage() {
         onOpenChange={setShowCitySearchDialog}
         onCitySelected={handleCitySelection}
       />
+
+      {/* Time block detail modal */}
+      <TimeBlockDetailDialog block={selectedBlock} onClose={() => setSelectedBlock(null)} />
     </div>
   );
 }

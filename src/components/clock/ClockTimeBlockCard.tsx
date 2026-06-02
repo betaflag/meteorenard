@@ -4,7 +4,7 @@ import { WeatherIcon } from '@/components/weather/WeatherIcon';
 import { Droplets, Snowflake } from 'lucide-react';
 import { getClothingIcon } from '@/services/clothing/clothingIconMap';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { TimeBlockPeriod } from '@/services/timeBlock/types';
+import { getTimeBlockLabel, translateClothingItem } from './timeBlockLabels';
 
 interface ClockTimeBlockCardProps {
   data: TimeBlockData;
@@ -32,63 +32,9 @@ export function ClockTimeBlockCard({ data }: ClockTimeBlockCardProps) {
     isNextDay,
   } = data;
 
-  // Get simplified label (just period name, with "Tomorrow" prefix if next day)
-  const getTranslatedLabel = () => {
-    let periodName = '';
-    switch (period) {
-      case TimeBlockPeriod.MORNING:
-        periodName = t.timeBlocks.morning.split(' ')[0]; // Just "Morning" or "Matin"
-        break;
-      case TimeBlockPeriod.AFTERNOON:
-        periodName = t.timeBlocks.afternoon.split(' ')[0]; // Just "Afternoon" or "Après-midi"
-        break;
-      case TimeBlockPeriod.EVENING:
-        periodName = t.timeBlocks.evening.split(' ')[0]; // Just "Evening" or "Soirée"
-        break;
-      default:
-        return '';
-    }
-
-    // Prefix with "Tomorrow" / "Demain" if this is for the next day
-    if (isNextDay) {
-      return `${t.timeBlocks.tomorrow} ${periodName.toLowerCase()}`;
-    }
-
-    return periodName;
-  };
-
-  // Translate clothing item name based on its ID
-  const translateClothingItem = (itemId: string): string => {
-    const idToKeyMap: Record<string, keyof typeof t.clothing> = {
-      'winter-hat': 'winterHat',
-      'neck-warmer': 'neckWarmer',
-      'mittens-gloves': 'mittensGloves',
-      'winter-coat': 'winterCoat',
-      'snow-pants': 'snowPants',
-      'winter-boots': 'winterBoots',
-      'thin-hat': 'lightHat',
-      'thin-gloves': 'lightGloves',
-      'mid-season-coat': 'midSeasonJacket',
-      'mid-season-pants': 'regularPants',
-      'rain-winter-boots': 'winterRainBoots',
-      'light-coat-vest': 'lightJacketVest',
-      'casual-pants': 'casualPants',
-      'outdoor-shoes': 'outdoorShoes',
-      'long-sleeve-shirt': 'lightLongSleeve',
-      'light-pants': 'lightPants',
-      'cap-hat': 'capHat',
-      'short-sleeve-shirt': 'shortSleeve',
-      'shorts-skirt': 'shortsSkirt',
-      'sunscreen': 'sunscreen',
-    };
-
-    const translationKey = idToKeyMap[itemId];
-    return translationKey ? t.clothing[translationKey] : itemId;
-  };
-
   // Show top 4 clothing items for more compact display
   const displayItems = clothingItems.slice(0, 4);
-  const translatedLabel = getTranslatedLabel();
+  const translatedLabel = getTimeBlockLabel(t, period, isNextDay);
 
   return (
     <Card
@@ -167,7 +113,7 @@ export function ClockTimeBlockCard({ data }: ClockTimeBlockCardProps) {
                   <div
                     key={`${item.id}-${index}`}
                     className="flex flex-col items-center"
-                    title={translateClothingItem(item.id)}
+                    title={translateClothingItem(t, item.id)}
                   >
                     {iconUrl ? (
                       <img

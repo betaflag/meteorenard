@@ -35,6 +35,32 @@ export interface Translations {
     tomorrow: string;
   };
 
+  // Time Block detail modal
+  timeBlockDetail: {
+    feelsLike: string;
+    high: string;
+    low: string;
+    wind: string;
+    humidity: string;
+    precipitationChance: string;
+    snow: string;
+    hourlyForecast: string;
+    recommendedClothing: string;
+    close: string;
+  };
+
+  // Short labels for our 8 normalized weather conditions
+  conditions: {
+    clear: string;
+    partlyCloudy: string;
+    cloudy: string;
+    rain: string;
+    heavyRain: string;
+    thunderstorm: string;
+    snow: string;
+    fog: string;
+  };
+
   // Weather Providers
   providers: {
     openMeteo: {
