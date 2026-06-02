@@ -38,6 +38,12 @@ export interface Translations {
     cancel: string;
   };
 
+  // Swap button toggling the tiles between today's time blocks and a 3-day outlook
+  forecastToggle: {
+    threeDay: string;
+    today: string;
+  };
+
   // Time Blocks
   timeBlocks: {
     morning: string;

@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
+import { CalendarDays, Clock } from 'lucide-react';
 import { ClockDisplay } from '@/components/clock/ClockDisplay';
 import { ClockTimeBlockCard } from '@/components/clock/ClockTimeBlockCard';
+import { ClockDayCard } from '@/components/clock/ClockDayCard';
 import { WeatherEffects } from '@/components/clock/WeatherEffects';
 import { TimeBlockDetailDialog } from '@/components/clock/TimeBlockDetailDialog';
 import { CurrentWeatherWidget } from '@/components/clock/CurrentWeatherWidget';
@@ -11,6 +13,7 @@ import { GlobePickerDialog } from '@/components/location/GlobePickerDialog';
 import { TimeBlockService } from '@/services/timeBlock/TimeBlockService';
 import { fetchWeather } from '@/services/weather/openMeteo';
 import { LocationStorageService } from '@/services/location/LocationStorageService';
+import { useLanguage } from '@/contexts/language';
 import type { WeatherData } from '@/types/weather';
 import type { TimeBlockData } from '@/services/timeBlock/types';
 import type { Location } from '@/types/location';
@@ -68,7 +71,27 @@ const getRandomBackground = (excludeCurrent?: string) => {
   return periodBackgrounds[randomIndex];
 };
 
+// Frosted pill matching the top-bar buttons, used for the forecast swap control.
+const swapButtonStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+  padding: '8px 16px',
+  borderRadius: '9999px',
+  fontSize: '0.9375rem',
+  fontWeight: 600,
+  color: '#ffffff',
+  cursor: 'pointer',
+  appearance: 'none',
+  background: 'rgba(255, 255, 255, 0.08)',
+  backdropFilter: 'blur(24px)',
+  WebkitBackdropFilter: 'blur(24px)',
+  border: '1px solid rgba(255, 255, 255, 0.2)',
+  boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 4px 16px rgba(0, 0, 0, 0.35)',
+};
+
 export function ClockPage() {
+  const { t } = useLanguage();
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [currentLocation, setCurrentLocation] = useState<Location | null>(() =>
     LocationStorageService.getCurrentLocation()
@@ -77,6 +100,7 @@ export function ClockPage() {
   const [showLocationPermissionDialog, setShowLocationPermissionDialog] = useState(false);
   const [showCitySearchDialog, setShowCitySearchDialog] = useState(false);
   const [showGlobePicker, setShowGlobePicker] = useState(false);
+  const [forecastView, setForecastView] = useState<'blocks' | 'days'>('blocks');
   const [selectedBlock, setSelectedBlock] = useState<TimeBlockData | null>(null);
 
   const fetchWeatherData = useCallback(async (location: Location) => {
@@ -145,6 +169,9 @@ export function ClockPage() {
   const timeBlocks = weatherData
     ? TimeBlockService.getTimeBlocksWithWeather(weatherData)
     : [];
+
+  // Get the next 3 days for the alternate outlook view
+  const dayCards = weatherData ? TimeBlockService.getDailyForecastCards(weatherData) : [];
 
   // Get the next time block's weather condition for effects
   const nextBlockCondition = timeBlocks.length > 0 ? timeBlocks[0].condition : null;
@@ -226,7 +253,7 @@ export function ClockPage() {
         </div>
 
         {/* Bottom Weather Cards Container */}
-        {currentLocation && timeBlocks.length > 0 && (
+        {currentLocation && (timeBlocks.length > 0 || dayCards.length > 0) && (
           <div
             className="flex-shrink-0"
             style={{
@@ -234,6 +261,36 @@ export function ClockPage() {
               background: 'linear-gradient(to top, rgba(0, 0, 0, 0.3) 0%, transparent 100%)',
             }}
           >
+            {/* Swap button: flips the tiles between today's time blocks and the 3-day outlook */}
+            <div style={{ maxWidth: '1400px', margin: '0 auto 16px auto', display: 'flex', justifyContent: 'flex-end' }}>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setForecastView((view) => (view === 'blocks' ? 'days' : 'blocks'));
+                }}
+                aria-label={
+                  forecastView === 'blocks'
+                    ? 'Show the 3-day forecast'
+                    : "Show today's time blocks"
+                }
+                className="font-raleway transition-transform hover:scale-[1.03] active:scale-95"
+                style={swapButtonStyle}
+              >
+                {forecastView === 'blocks' ? (
+                  <>
+                    <CalendarDays size={18} style={{ color: '#8fd0ff' }} />
+                    {t.forecastToggle.threeDay}
+                  </>
+                ) : (
+                  <>
+                    <Clock size={18} style={{ color: '#8fd0ff' }} />
+                    {t.forecastToggle.today}
+                  </>
+                )}
+              </button>
+            </div>
+
             {/* Weather Cards Grid - Responsive with 3 columns on large screens */}
             <div
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
@@ -243,22 +300,33 @@ export function ClockPage() {
                 margin: '0 auto',
               }}
             >
-              {timeBlocks.slice(0, 3).map((block, index) => (
-                <div
-                  key={`${block.period}-${index}`}
-                  data-timeblock-card
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleTimeBlockClick(block);
-                  }}
-                  style={{
-                    height: '280px', // Fixed height for consistency
-                    cursor: 'pointer',
-                  }}
-                >
-                  <ClockTimeBlockCard data={block} />
-                </div>
-              ))}
+              {forecastView === 'blocks'
+                ? timeBlocks.slice(0, 3).map((block, index) => (
+                    <div
+                      key={`${block.period}-${index}`}
+                      data-timeblock-card
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleTimeBlockClick(block);
+                      }}
+                      style={{
+                        height: '280px', // Fixed height for consistency
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <ClockTimeBlockCard data={block} />
+                    </div>
+                  ))
+                : dayCards.slice(0, 3).map((day) => (
+                    <div
+                      key={day.date}
+                      data-timeblock-card
+                      onClick={(e) => e.stopPropagation()}
+                      style={{ height: '280px' }}
+                    >
+                      <ClockDayCard data={day} />
+                    </div>
+                  ))}
             </div>
           </div>
         )}

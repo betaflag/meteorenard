@@ -45,3 +45,18 @@ export interface TimeBlockData {
   uvIndex?: number; // Peak UV index across the block
   hours: HourlyWeather[]; // Hourly forecasts within the block ([] when none matched)
 }
+
+/**
+ * Weather and clothing data for a single upcoming day, used by the 3-day
+ * outlook tiles. Derived from the daily forecast, which has no hourly series
+ * (so no UV/feels-like/wind), unlike {@link TimeBlockData}.
+ */
+export interface DayForecastData {
+  date: string; // ISO date from DailyWeather
+  isTomorrow: boolean; // True for the first day (the daily forecast starts tomorrow)
+  tempHigh: number;
+  tempLow: number;
+  condition: WeatherCondition;
+  precipitationProbability?: number;
+  clothingItems: ClothingItem[]; // Recommended for the day's low temperature
+}

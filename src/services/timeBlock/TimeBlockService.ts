@@ -1,5 +1,5 @@
 import type { WeatherData, HourlyWeather, WeatherCondition } from '@/types/weather';
-import type { TimeBlockConfig, TimeBlockData } from './types';
+import type { TimeBlockConfig, TimeBlockData, DayForecastData } from './types';
 import { TimeBlockPeriod as Period } from './types';
 import { ClothingRecommendationService } from '../clothing/ClothingRecommendationService';
 import type { ClothingItem } from '../clothing/types';
@@ -104,7 +104,10 @@ export class TimeBlockService {
    * precipitation probability). Snow is excluded — that's handled by the cold
    * temperature tiers. Returns a new array only when injecting.
    */
-  private static applyRainGear(items: ClothingItem[], weather: BlockWeather | null): ClothingItem[] {
+  private static applyRainGear(
+    items: ClothingItem[],
+    weather: Pick<BlockWeather, 'condition' | 'precipitationProbability'> | null
+  ): ClothingItem[] {
     if (!weather || weather.condition === 'snow') {
       return items;
     }
@@ -360,5 +363,38 @@ export class TimeBlockService {
     return this.getUpcomingBlockInstances(now, 3).map((instance) =>
       this.mapWeatherToTimeBlock(instance, weatherData)
     );
+  }
+
+  /**
+   * Get the next `count` days with weather and clothing recommendations for the
+   * 3-day outlook tiles.
+   *
+   * The daily forecast already starts tomorrow (the adapter drops today), so the
+   * first entry is "tomorrow". Clothing is dressed for the day's low temperature
+   * (the chilliest part), with an umbrella added on rainy days. Sunscreen is
+   * omitted because daily data carries no UV index.
+   *
+   * @param weatherData - Weather data from API
+   * @param count - Number of days to return
+   * @returns Array of DayForecastData objects (fewer if the forecast is shorter)
+   */
+  static getDailyForecastCards(
+    weatherData: WeatherData | null,
+    count = 3
+  ): DayForecastData[] {
+    const daily = weatherData?.daily ?? [];
+    return daily.slice(0, count).map((day, index) => {
+      const baseClothing = ClothingRecommendationService.getRecommendations(day.tempLow);
+      const clothingItems = this.applyRainGear(baseClothing, day);
+      return {
+        date: day.date,
+        isTomorrow: index === 0,
+        tempHigh: day.tempHigh,
+        tempLow: day.tempLow,
+        condition: day.condition,
+        precipitationProbability: day.precipitationProbability,
+        clothingItems,
+      };
+    });
   }
 }

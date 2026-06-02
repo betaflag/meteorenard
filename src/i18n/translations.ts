@@ -35,6 +35,11 @@ const en: Translations = {
     cancel: 'Cancel',
   },
 
+  forecastToggle: {
+    threeDay: '3-Day',
+    today: 'Today',
+  },
+
   timeBlocks: {
     morning: 'Morning (8am-12pm)',
     afternoon: 'Afternoon (12pm-5pm)',
@@ -183,6 +188,11 @@ const fr: Translations = {
     loadError: 'Impossible de charger le globe. Réessaie.',
     confirm: 'Voir la météo ici',
     cancel: 'Annuler',
+  },
+
+  forecastToggle: {
+    threeDay: '3 jours',
+    today: 'Aujourd\'hui',
   },
 
   timeBlocks: {

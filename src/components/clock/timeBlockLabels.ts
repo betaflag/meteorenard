@@ -68,6 +68,20 @@ export function getTimeBlockLabel(
 }
 
 /**
+ * Localized label for a 3-day outlook card: "Tomorrow" for the first day, then
+ * the weekday name (Mon, Tue, ...) for the rest. The date is parsed at UTC noon
+ * to avoid a timezone shift flipping the weekday.
+ */
+export function getDayCardLabel(t: Translations, date: string, isTomorrow: boolean): string {
+  if (isTomorrow) {
+    return t.timeBlocks.tomorrow;
+  }
+  const weekdayKeys: (keyof typeof t.days)[] = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+  const dayIndex = new Date(date + 'T12:00:00Z').getUTCDay();
+  return t.days[weekdayKeys[dayIndex]];
+}
+
+/**
  * Translated WHO exposure level for a UV index value (Low / Moderate / High /
  * Very high / Extreme).
  */
