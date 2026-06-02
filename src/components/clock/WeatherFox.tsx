@@ -15,24 +15,73 @@ import foxCloudy from '@/assets/fox/fox-cloudy.png';
 import foxCool from '@/assets/fox/fox-cool.png';
 import foxWarm from '@/assets/fox/fox-warm.png';
 import foxMild from '@/assets/fox/fox-mild.png';
+// Extra pose variants (chosen at random within a mood)
+import foxRainy2 from '@/assets/fox/fox-rainy-2.png';
+import foxSunny2 from '@/assets/fox/fox-sunny-2.png';
+import foxCool2 from '@/assets/fox/fox-cool-2.png';
+import foxWarm2 from '@/assets/fox/fox-warm-2.png';
+import foxMild2 from '@/assets/fox/fox-mild-2.png';
+// Calendar specials
+import foxHalloween from '@/assets/fox/fox-halloween.png';
+import foxChristmas from '@/assets/fox/fox-christmas.png';
+import foxNewyear from '@/assets/fox/fox-newyear.png';
+import foxValentines from '@/assets/fox/fox-valentines.png';
+import foxMaple from '@/assets/fox/fox-maple.png';
+import foxStjean from '@/assets/fox/fox-stjean.png';
+import foxEaster from '@/assets/fox/fox-easter.png';
+import foxStpatrick from '@/assets/fox/fox-stpatrick.png';
+import foxCanadaday from '@/assets/fox/fox-canadaday.png';
+import foxThanksgiving from '@/assets/fox/fox-thanksgiving.png';
+import foxEarthday from '@/assets/fox/fox-earthday.png';
+import foxGroundhog from '@/assets/fox/fox-groundhog.png';
+import foxFullmoon from '@/assets/fox/fox-fullmoon.png';
+import foxMeteor from '@/assets/fox/fox-meteor.png';
+import foxSolsticeSummer from '@/assets/fox/fox-solstice-summer.png';
+import foxSolsticeWinter from '@/assets/fox/fox-solstice-winter.png';
+import foxAprilfools from '@/assets/fox/fox-aprilfools.png';
+import foxFriday13 from '@/assets/fox/fox-friday13.png';
+import foxPiday from '@/assets/fox/fox-piday.png';
+import foxPirate from '@/assets/fox/fox-pirate.png';
+import foxStarwars from '@/assets/fox/fox-starwars.png';
 
 // Each mood can carry several pose variants; one is chosen at random and stays
 // put until the mood changes. Single-entry moods are deterministic.
 const FOX_SPRITES: Record<FoxMood, string[]> = {
   snowy: [foxSnowy],
   stormy: [foxStormy],
-  rainy: [foxRainy],
+  rainy: [foxRainy, foxRainy2],
   cold: [foxCold],
   hot: [foxHot],
-  sunny: [foxSunny],
+  sunny: [foxSunny, foxSunny2],
   windy: [foxWindy],
   foggy: [foxFoggy],
   sleepy: [foxSleepy],
   morning: [foxMorning],
   cloudy: [foxCloudy],
-  cool: [foxCool],
-  warm: [foxWarm],
-  mild: [foxMild],
+  cool: [foxCool, foxCool2],
+  warm: [foxWarm, foxWarm2],
+  mild: [foxMild, foxMild2],
+  halloween: [foxHalloween],
+  christmas: [foxChristmas],
+  newyear: [foxNewyear],
+  valentines: [foxValentines],
+  maple: [foxMaple],
+  stjean: [foxStjean],
+  easter: [foxEaster],
+  stpatrick: [foxStpatrick],
+  canadaday: [foxCanadaday],
+  thanksgiving: [foxThanksgiving],
+  earthday: [foxEarthday],
+  groundhog: [foxGroundhog],
+  solsticeSummer: [foxSolsticeSummer],
+  solsticeWinter: [foxSolsticeWinter],
+  aprilfools: [foxAprilfools],
+  friday13: [foxFriday13],
+  piday: [foxPiday],
+  pirate: [foxPirate],
+  starwars: [foxStarwars],
+  fullmoon: [foxFullmoon],
+  meteor: [foxMeteor],
 };
 
 /**
