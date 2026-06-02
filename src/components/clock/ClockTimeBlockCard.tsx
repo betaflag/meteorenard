@@ -75,23 +75,8 @@ export function ClockTimeBlockCard({ data }: ClockTimeBlockCardProps) {
 
         {/* Weather and clothing combined section */}
         <div className="flex-1 flex flex-col justify-between">
-          {/* Weather info - feels-like label, hero row, then one secondary line */}
+          {/* Weather info - hero row, then one secondary line */}
           <div className="flex flex-col items-center">
-            {temp.isFeelsLike && (
-              <span
-                className="font-raleway font-semibold"
-                style={{
-                  fontSize: '0.8rem',
-                  color: '#C5A572',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.08em',
-                  marginBottom: '6px',
-                }}
-              >
-                {t.timeBlockDetail.feelsLike}
-              </span>
-            )}
-
             {/* Hero row: condition icon + primary temperature */}
             <div className="flex items-center justify-center gap-5">
               <div

@@ -9,7 +9,7 @@ export const CLOTHING_ICON_MAP: Record<string, string> = {
   'neck-warmer': 'foulard.png',
   'mittens-gloves': 'mitaines.png',
   'winter-coat': 'manteau-hiver.png',
-  'snow-pants': 'pantalon-leger.png', // Using pantalon-leger as proxy
+  'snow-pants': 'pantalon-neige.png',
   'winter-boots': 'bottes-hiver.png',
 
   // 0 to 8°C - Mid-season clothing
@@ -22,18 +22,18 @@ export const CLOTHING_ICON_MAP: Record<string, string> = {
   // 8 to 18°C - Light outerwear
   'light-coat-vest': 'manteau-leger.png',
   'casual-pants': 'pantalon-leger.png',
-  'outdoor-shoes': 'bottes-pluie.png', // Using rain boots as proxy for outdoor shoes
+  'outdoor-shoes': 'espadrilles.png',
 
   // 18 to 22°C - Light long sleeves
   'light-long-sleeve': 't-shirt-manches-longues.png',
   'light-pants': 'pantalon-leger.png',
-  'outdoor-shoes-2': 'bottes-pluie.png',
+  'outdoor-shoes-2': 'espadrilles.png',
 
   // 22°C and above - Summer clothing
   'cap-hat': 'casquette.png',
   'short-sleeve': 't-shirt-leger.png',
   'shorts-skirt': 'short.png',
-  'outdoor-shoes-3': 'bottes-pluie.png',
+  'outdoor-shoes-3': 'espadrilles.png',
   'sunscreen': 'creme-solaire.png',
 
   // Additional items for special conditions
