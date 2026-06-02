@@ -203,7 +203,7 @@ export function CurrentWeatherWidget({ location, weather }: CurrentWeatherWidget
               top: '100%',
               right: `${TAIL_OFFSET_RIGHT}px`,
               transform: 'translateX(50%)',
-              marginTop: '-2px',
+              marginTop: '16px',
             }}
           >
             <WeatherFox weather={weather} />
