@@ -3,6 +3,7 @@ import { ClockDisplay } from '@/components/clock/ClockDisplay';
 import { ClockTimeBlockCard } from '@/components/clock/ClockTimeBlockCard';
 import { WeatherEffects } from '@/components/clock/WeatherEffects';
 import { TimeBlockDetailDialog } from '@/components/clock/TimeBlockDetailDialog';
+import { CurrentWeatherWidget } from '@/components/clock/CurrentWeatherWidget';
 import { LocationPermissionDialog } from '@/components/location/LocationPermissionDialog';
 import { CitySearchDialog } from '@/components/location/CitySearchDialog';
 import { TimeBlockService } from '@/services/timeBlock/TimeBlockService';
@@ -192,11 +193,20 @@ export function ClockPage() {
           margin: '0 auto',
         }}
       >
+        {/* Top Bar - Location and current conditions */}
+        {currentLocation && (
+          <div className="flex-shrink-0" style={{ padding: '32px 40px 0 40px' }}>
+            <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+              <CurrentWeatherWidget location={currentLocation} weather={weatherData} />
+            </div>
+          </div>
+        )}
+
         {/* Main Content Area - Clock and Date */}
         <div
           className="flex-1 flex flex-col items-center justify-center"
           style={{
-            paddingTop: '60px',
+            paddingTop: '40px',
             paddingBottom: '40px',
           }}
         >
