@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Météo Renard is a weather application for Montréal, QC built with React, TypeScript, Vite, and Tailwind CSS. The application fetches weather data from multiple providers and displays current conditions and hourly forecasts.
+Météo Renard is a full-screen weather **clock** for Montréal, QC, built for an always-on tablet in kiosk mode (landscape). React, TypeScript, Vite, and Tailwind CSS. It fetches weather from multiple providers and shows a large clock, the current conditions with a mascot fox dressed for the weather, three upcoming time-block cards with clothing recommendations, and a compact 24-hour timeline.
+
+The clock is the only screen, served at the root path `/`. The legacy `/clock` path redirects to `/`.
 
 ## Development Commands
 
@@ -85,52 +87,38 @@ The application has a rich service layer organized by domain:
 
 The application uses **React hooks-based state management** without external state libraries:
 
-- **App.tsx** serves as the orchestrator, managing:
-  - Weather data fetching and caching
-  - Active weather provider selection
-  - Current location state
-  - Periodic refresh (10-minute intervals)
-  - Error and loading states
-- State flows down via props to child components
-- Location state managed by `LocationStorageService` (persisted in localStorage)
-- No global state management library (Redux, Zustand, etc.)
-- Components use local state (useState) for UI-specific concerns
-- Data fetching orchestrated at App level, passed down as props
+- **`App.tsx`** is just the router: `/` renders `ClockPage`, and `/clock` redirects to `/`. It wraps everything in `LanguageProvider`.
+- **`ClockPage`** (`src/pages/ClockPage.tsx`) is the orchestrator, managing:
+  - Weather data fetching and caching for the current location
+  - Current location state and the first-run location/permission flow
+  - Periodic refresh (5-minute intervals for weather + background rotation)
+  - Selected time block (for the detail modal) and the rotating background image
+- Location state is managed by `LocationStorageService` (persisted in localStorage).
+- No global state management library (Redux, Zustand, etc.); components use local `useState`.
 
 ### Component Structure
 
-**Main App Container**:
-- `App.tsx` - Root component managing global state, provider switching, data fetching, and periodic refresh
+**Routing**:
+- `App.tsx` - `BrowserRouter` with `/` → `ClockPage` and `/clock` → redirect to `/`.
 
-**Layout Components**:
-- `components/layout/Header.tsx` - App header with branding and provider toggle
-- `components/layout/AppMenu.tsx` - Navigation/settings menu
-- `components/layout/WeatherHero.tsx` - Hero section with background image and parallax effect
+**Clock page** (`src/pages/ClockPage.tsx`) and its components (`src/components/clock/`):
+- `ClockDisplay.tsx` - Large clock + date.
+- `CurrentWeatherWidget.tsx` - Top bar: clickable location pill (opens city search) and a frosted speech bubble of current conditions with the mascot fox tucked beneath it.
+- `WeatherFox.tsx` / `foxMood.ts` - Mascot fox that dresses for the weather/time of day, with date-based holiday and celestial specials. Resolver precedence: holiday → notable weather → night-sky → time of day → temperature band.
+- `ClockTimeBlockCard.tsx` - One of the three upcoming time-block cards (temp, condition, precip/UV, clothing icons). Tapping it opens `TimeBlockDetailDialog.tsx`.
+- `HourlyTimeline.tsx` - Compact full-width 24h strip in the bottom bar: temperature curve, day/night shading, sunrise/sunset, precip, "now" anchor.
+- `WeatherEffects.tsx` - Ambient rain/snow overlay for the upcoming block.
+- Helpers: `tempDisplay.ts` (feels-like-as-hero rule), `timeBlockLabels.ts` (i18n labels), `clothingIconMap.ts` (`SUN_PROTECTION_COLOR`).
 
-**Location Components**:
-- `components/location/LocationPermissionDialog.tsx` - First-run geolocation permission request
-- `components/location/CitySearchDialog.tsx` - City search interface with popular Quebec/Canada cities
-- `components/location/LocationSelector.tsx` - Dropdown for quick switching between saved locations
+**Location dialogs** (`src/components/location/`):
+- `LocationPermissionDialog.tsx` - First-run geolocation permission request.
+- `CitySearchDialog.tsx` - City search with popular Quebec/Canada cities.
 
-**Weather Widget Components**:
-- `components/weather/WeatherWidget.tsx` - Current weather conditions with loading/error states
-- `components/weather/HourlyChartWidget.tsx` - Temperature chart for next 24 hours (uses Recharts)
-- `components/weather/DailyForecastWidget.tsx` - 10-day forecast overview
-- `components/weather/ClothingForecastWidget.tsx` - Time block-based clothing recommendations
-
-**Weather Display Components**:
-- `components/weather/CurrentWeather.tsx` - Current conditions display
-- `components/weather/HourlyForecast.tsx` - Scrollable hourly forecast (next 8 hours)
-- `components/weather/HourlyChart.tsx` - Chart component for temperature visualization
-- `components/weather/DailyForecast.tsx` - Daily forecast list
-- `components/weather/HourlyItem.tsx` - Individual hourly forecast item
-- `components/weather/DailyItem.tsx` - Individual daily forecast item
-- `components/weather/TimeBlockCard.tsx` - Time block with weather and clothing recommendations
-- `components/weather/WeatherIcon.tsx` - Weather condition icon mapping
-- `components/weather/ProviderToggle.tsx` - UI for switching between weather providers
+**Shared weather** (`src/components/weather/`):
+- `WeatherIcon.tsx` - Weather condition → icon mapping (used across the clock components).
 
 **UI Primitives** (`components/ui/`):
-- Reusable components using Radix UI: card, badge, select, button, sheet (dialog/drawer)
+- Reusable components using Radix UI: `card`, `button`, `dialog`.
 
 ### Path Aliases
 
@@ -190,9 +178,9 @@ Features:
 ## Key Dependencies
 
 - **React 19** with hooks-based state management
-- **Radix UI** for accessible UI primitives (@radix-ui/react-dialog, @radix-ui/react-select, @radix-ui/react-slot)
+- **react-router-dom** for routing (`/` clock, `/clock` redirect)
+- **Radix UI** for accessible UI primitives (@radix-ui/react-dialog, @radix-ui/react-slot)
 - **Lucide React** for icons
-- **Recharts** for temperature charts and data visualization
 - **Vite** for build tooling with React plugin
 - **Tailwind CSS v4** for styling via `@tailwindcss/vite` plugin
 - **tsx** for running TypeScript scripts (used by Gemini CLI tool)

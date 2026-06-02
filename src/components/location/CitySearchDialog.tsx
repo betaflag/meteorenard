@@ -9,7 +9,7 @@ import {
 import { Search, MapPin, Loader2, Globe, Navigation } from 'lucide-react';
 import { GeocodingService, type CitySearchResult } from '@/services/geocoding/GeocodingService';
 import { GeolocationService } from '@/services/geolocation/GeolocationService';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useLanguage } from '@/contexts/language';
 import type { Location } from '@/types/location';
 
 interface CitySearchDialogProps {

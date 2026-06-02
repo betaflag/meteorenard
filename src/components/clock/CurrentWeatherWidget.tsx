@@ -3,7 +3,7 @@ import { MapPin, Wind, Sun } from 'lucide-react';
 import type { Location } from '@/types/location';
 import type { WeatherData } from '@/types/weather';
 import { WeatherIcon } from '@/components/weather/WeatherIcon';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useLanguage } from '@/contexts/language';
 import { translateCondition } from './timeBlockLabels';
 import { getTempDisplay } from './tempDisplay';
 import { WeatherFox } from './WeatherFox';

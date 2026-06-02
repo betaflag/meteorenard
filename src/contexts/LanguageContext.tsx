@@ -1,14 +1,7 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import type { Language, Translations } from '@/types/i18n';
+import { useState, useEffect, type ReactNode } from 'react';
+import type { Language } from '@/types/i18n';
 import { translations } from '@/i18n/translations';
-
-interface LanguageContextType {
-  language: Language;
-  setLanguage: (lang: Language) => void;
-  t: Translations;
-}
-
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+import { LanguageContext, type LanguageContextType } from './language';
 
 const STORAGE_KEY = 'weatherApp_language';
 
@@ -50,17 +43,5 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     t: translations[language],
   };
 
-  return (
-    <LanguageContext.Provider value={value}>
-      {children}
-    </LanguageContext.Provider>
-  );
-}
-
-export function useLanguage() {
-  const context = useContext(LanguageContext);
-  if (context === undefined) {
-    throw new Error('useLanguage must be used within a LanguageProvider');
-  }
-  return context;
+  return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
 }

@@ -8,7 +8,7 @@ import {
 import type { TimeBlockData } from '@/services/timeBlock/types';
 import { WeatherIcon } from '@/components/weather/WeatherIcon';
 import { getClothingIcon, SUN_PROTECTION_COLOR } from '@/services/clothing/clothingIconMap';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useLanguage } from '@/contexts/language';
 import {
   getTimeBlockLabel,
   translateClothingItem,

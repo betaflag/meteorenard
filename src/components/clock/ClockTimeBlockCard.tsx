@@ -3,7 +3,7 @@ import type { TimeBlockData } from '@/services/timeBlock/types';
 import { WeatherIcon } from '@/components/weather/WeatherIcon';
 import { Droplets, Snowflake, Wind, Sun } from 'lucide-react';
 import { getClothingIcon, SUN_PROTECTION_COLOR } from '@/services/clothing/clothingIconMap';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useLanguage } from '@/contexts/language';
 import { getTimeBlockLabel, translateClothingItem } from './timeBlockLabels';
 import { getTempDisplay } from './tempDisplay';
 

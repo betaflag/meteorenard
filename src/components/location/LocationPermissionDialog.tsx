@@ -10,7 +10,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { MapPin, Loader2, AlertCircle } from 'lucide-react';
 import { GeolocationService } from '@/services/geolocation/GeolocationService';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useLanguage } from '@/contexts/language';
 import type { Location } from '@/types/location';
 
 interface LocationPermissionDialogProps {
