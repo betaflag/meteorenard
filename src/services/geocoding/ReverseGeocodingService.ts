@@ -78,21 +78,23 @@ export class ReverseGeocodingService {
   }
 
   /**
-   * Extract city name from Nominatim response
-   * Tries multiple fields in order of preference
+   * Extract a place name from a Nominatim response, preferring the most
+   * specific locality but falling back to broader regions (state, country) so
+   * remote land taps on the globe still resolve to a friendly name.
    * @private
    */
   private static extractCityName(data: NominatimResponse): string | null {
     const address = data.address;
     if (!address) return null;
 
-    // Try to get the most specific locality name
     return (
       address.city ||
       address.town ||
       address.village ||
       address.municipality ||
       address.county ||
+      address.state ||
+      address.country ||
       null
     );
   }

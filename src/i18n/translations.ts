@@ -25,6 +25,16 @@ const en: Translations = {
     removeCity: 'Remove this city',
   },
 
+  globePicker: {
+    title: 'Explore the planet',
+    instruction: 'Spin the Earth and tap anywhere to see its weather!',
+    resolving: 'Finding this place...',
+    selectedPlace: 'Selected place',
+    noSelection: 'Tap a spot on the globe',
+    confirm: 'See the weather here',
+    cancel: 'Cancel',
+  },
+
   timeBlocks: {
     morning: 'Morning (8am-12pm)',
     afternoon: 'Afternoon (12pm-5pm)',
@@ -163,6 +173,16 @@ const fr: Translations = {
     noCitiesFound: 'Aucune ville trouvée pour',
     popularCities: 'Villes populaires',
     removeCity: 'Supprimer cette ville',
+  },
+
+  globePicker: {
+    title: 'Explore la planète',
+    instruction: 'Fais tourner la Terre et touche un endroit pour voir sa météo !',
+    resolving: 'Recherche de cet endroit...',
+    selectedPlace: 'Endroit choisi',
+    noSelection: 'Touche un point sur le globe',
+    confirm: 'Voir la météo ici',
+    cancel: 'Annuler',
   },
 
   timeBlocks: {
