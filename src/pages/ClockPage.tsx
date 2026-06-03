@@ -4,7 +4,7 @@ import { ClockDisplay } from '@/components/clock/ClockDisplay';
 import { ClockTimeBlockCard } from '@/components/clock/ClockTimeBlockCard';
 import { ClockDayCard } from '@/components/clock/ClockDayCard';
 import { WeatherEffects } from '@/components/clock/WeatherEffects';
-import { TimeBlockDetailDialog } from '@/components/clock/TimeBlockDetailDialog';
+import { WeatherDetailDialog } from '@/components/clock/WeatherDetailDialog';
 import { CurrentWeatherWidget } from '@/components/clock/CurrentWeatherWidget';
 import { HourlyTimeline } from '@/components/clock/HourlyTimeline';
 import { LocationPermissionDialog } from '@/components/location/LocationPermissionDialog';
@@ -15,8 +15,13 @@ import { fetchWeather } from '@/services/weather/openMeteo';
 import { LocationStorageService } from '@/services/location/LocationStorageService';
 import { useLanguage } from '@/contexts/language';
 import { getZonedNow } from '@/lib/time';
+import {
+  timeBlockToDetail,
+  dayToDetail,
+  type WeatherDetail,
+} from '@/components/clock/weatherDetail';
 import type { WeatherData } from '@/types/weather';
-import type { TimeBlockData } from '@/services/timeBlock/types';
+import type { TimeBlockData, DayForecastData } from '@/services/timeBlock/types';
 import type { Location } from '@/types/location';
 
 // Background images are organised by season and time of day. Each season/period
@@ -93,7 +98,7 @@ const swapButtonStyle: React.CSSProperties = {
 };
 
 export function ClockPage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [currentLocation, setCurrentLocation] = useState<Location | null>(() =>
     LocationStorageService.getCurrentLocation()
@@ -105,7 +110,7 @@ export function ClockPage() {
   const [showCitySearchDialog, setShowCitySearchDialog] = useState(false);
   const [showGlobePicker, setShowGlobePicker] = useState(false);
   const [forecastView, setForecastView] = useState<'blocks' | 'days'>('blocks');
-  const [selectedBlock, setSelectedBlock] = useState<TimeBlockData | null>(null);
+  const [selectedDetail, setSelectedDetail] = useState<WeatherDetail | null>(null);
 
   // Latest location timezone, read by the background interval/handler so their
   // closures aren't stale when the location (and its zone) changes.
@@ -187,10 +192,13 @@ export function ClockPage() {
   // Get the next time block's weather condition for effects
   const nextBlockCondition = timeBlocks.length > 0 ? timeBlocks[0].condition : null;
 
-  // Handle clicking a time block to open its detail modal
-  const handleTimeBlockClick = useCallback((block: TimeBlockData) => {
-    setSelectedBlock(block);
-  }, []);
+  // Open the detail modal for a time block or a forecast day
+  const openBlockDetail = (block: TimeBlockData) => {
+    setSelectedDetail(timeBlockToDetail(t, block));
+  };
+  const openDayDetail = (day: DayForecastData) => {
+    setSelectedDetail(dayToDetail(t, language, day, TimeBlockService.getDayDetail(weatherData, day.date)));
+  };
 
   // Handle tap/click to change background
   const handleBackgroundChange = (e: React.MouseEvent) => {
@@ -323,7 +331,7 @@ export function ClockPage() {
                       data-timeblock-card
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleTimeBlockClick(block);
+                        openBlockDetail(block);
                       }}
                       style={{
                         height: '280px', // Fixed height for consistency
@@ -337,8 +345,14 @@ export function ClockPage() {
                     <div
                       key={day.date}
                       data-timeblock-card
-                      onClick={(e) => e.stopPropagation()}
-                      style={{ height: '280px' }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openDayDetail(day);
+                      }}
+                      style={{
+                        height: '280px',
+                        cursor: 'pointer',
+                      }}
                     >
                       <ClockDayCard data={day} />
                     </div>
@@ -383,8 +397,8 @@ export function ClockPage() {
         onLocationSelected={handleCitySelection}
       />
 
-      {/* Time block detail modal */}
-      <TimeBlockDetailDialog block={selectedBlock} onClose={() => setSelectedBlock(null)} />
+      {/* Weather detail modal (time block or forecast day) */}
+      <WeatherDetailDialog detail={selectedDetail} onClose={() => setSelectedDetail(null)} />
     </div>
   );
 }

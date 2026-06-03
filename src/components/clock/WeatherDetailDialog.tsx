@@ -5,16 +5,15 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import type { TimeBlockData } from '@/services/timeBlock/types';
 import { WeatherIcon } from '@/components/weather/WeatherIcon';
 import { getClothingIcon, protectionTint } from '@/services/clothing/clothingIconMap';
 import { useLanguage } from '@/contexts/language';
 import {
-  getTimeBlockLabel,
   translateClothingItem,
   translateCondition,
   translateUvLevel,
 } from './timeBlockLabels';
+import type { WeatherDetail } from './weatherDetail';
 import {
   Droplet,
   Droplets,
@@ -26,8 +25,8 @@ import {
   X,
 } from 'lucide-react';
 
-interface TimeBlockDetailDialogProps {
-  block: TimeBlockData | null;
+interface WeatherDetailDialogProps {
+  detail: WeatherDetail | null;
   onClose: () => void;
 }
 
@@ -44,13 +43,6 @@ const clothingIconFilter =
 
 const BRASS = '#C5A572';
 const ORANGE = '#ff6b00';
-
-// Format a 24-hour value as a compact 12-hour label (e.g. 17 -> "5 pm").
-const formatHour = (hour: number): string => {
-  const suffix = hour >= 12 ? 'pm' : 'am';
-  const display = hour % 12 === 0 ? 12 : hour % 12;
-  return `${display} ${suffix}`;
-};
 
 function SectionHeading({ children }: { children: string }) {
   return (
@@ -79,22 +71,28 @@ function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; 
   );
 }
 
-export function TimeBlockDetailDialog({ block, onClose }: TimeBlockDetailDialogProps) {
+/**
+ * Detail modal for a weather selection — a time block or a forecast day. Renders
+ * a {@link WeatherDetail} view-model: hero temperature, metric grid, an optional
+ * hourly strip, and the recommended clothing. Sections hide when their data is
+ * absent (e.g. days beyond the hourly window show no strip).
+ */
+export function WeatherDetailDialog({ detail, onClose }: WeatherDetailDialogProps) {
   const { t } = useLanguage();
 
   const showSnow =
-    block?.condition === 'snow' &&
-    block.snowAccumulation !== undefined &&
-    block.snowAccumulation > 0;
+    detail?.condition === 'snow' &&
+    detail.snowAccumulation !== undefined &&
+    detail.snowAccumulation > 0;
 
   return (
     <Dialog
-      open={block !== null}
+      open={detail !== null}
       onOpenChange={(open) => {
         if (!open) onClose();
       }}
     >
-      {block && (
+      {detail && (
         <DialogContent
           hideCloseButton
           className="flex flex-col gap-0 p-0 overflow-hidden max-w-3xl w-[calc(100vw-2rem)] max-h-[calc(100dvh-1.5rem)]"
@@ -111,10 +109,10 @@ export function TimeBlockDetailDialog({ block, onClose }: TimeBlockDetailDialogP
                   letterSpacing: '0.01em',
                 }}
               >
-                {getTimeBlockLabel(t, block.period, block.isNextDay)}
+                {detail.title}
               </DialogTitle>
               <DialogDescription style={{ fontSize: 'clamp(0.95rem, 2.2vh, 1.125rem)' }}>
-                {formatHour(block.startHour)} – {formatHour(block.endHour)}
+                {detail.subtitle}
               </DialogDescription>
             </div>
             <DialogClose asChild>
@@ -145,7 +143,7 @@ export function TimeBlockDetailDialog({ block, onClose }: TimeBlockDetailDialogP
               <div className="flex items-center gap-4">
                 <div style={{ color: BRASS, filter: 'drop-shadow(0 0 8px rgba(197, 165, 114, 0.6))' }}>
                   <WeatherIcon
-                    condition={block.condition}
+                    condition={detail.condition}
                     size={80}
                     className="h-[clamp(56px,11vh,80px)] w-[clamp(56px,11vh,80px)]"
                   />
@@ -155,75 +153,75 @@ export function TimeBlockDetailDialog({ block, onClose }: TimeBlockDetailDialogP
                     className="font-raleway font-bold text-white"
                     style={{ fontSize: 'clamp(2.5rem, 8vh, 4.25rem)', lineHeight: '1' }}
                   >
-                    {Math.round(block.temperature)}°
+                    {Math.round(detail.temperature)}°
                   </span>
                   <span className="text-[#e5e7eb]" style={{ fontSize: 'clamp(1rem, 2.4vh, 1.25rem)' }}>
-                    {translateCondition(t, block.condition)}
+                    {translateCondition(t, detail.condition)}
                   </span>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-x-10 gap-y-4">
-                {block.feelsLike !== undefined && (
+                {detail.feelsLike !== undefined && (
                   <Metric
                     icon={<Thermometer size={22} />}
                     label={t.timeBlockDetail.feelsLike}
-                    value={`${Math.round(block.feelsLike)}°`}
+                    value={`${Math.round(detail.feelsLike)}°`}
                   />
                 )}
-                {block.tempHigh !== undefined && block.tempLow !== undefined && (
+                {detail.tempHigh !== undefined && detail.tempLow !== undefined && (
                   <Metric
                     icon={<ChevronsUpDown size={22} />}
                     label={`${t.timeBlockDetail.high} / ${t.timeBlockDetail.low}`}
-                    value={`${Math.round(block.tempHigh)}° / ${Math.round(block.tempLow)}°`}
+                    value={`${Math.round(detail.tempHigh)}° / ${Math.round(detail.tempLow)}°`}
                   />
                 )}
                 {showSnow ? (
                   <Metric
                     icon={<Snowflake size={22} />}
                     label={t.timeBlockDetail.snow}
-                    value={`${block.snowAccumulation!.toFixed(1)} cm`}
+                    value={`${detail.snowAccumulation!.toFixed(1)} cm`}
                   />
                 ) : (
-                  block.precipitationProbability !== undefined &&
-                  block.precipitationProbability > 0 && (
+                  detail.precipitationProbability !== undefined &&
+                  detail.precipitationProbability > 0 && (
                     <Metric
                       icon={<Droplets size={22} />}
                       label={t.timeBlockDetail.precipitationChance}
-                      value={`${Math.round(block.precipitationProbability)}%`}
+                      value={`${Math.round(detail.precipitationProbability)}%`}
                     />
                   )
                 )}
-                {block.windSpeed !== undefined && (
+                {detail.windSpeed !== undefined && (
                   <Metric
                     icon={<Wind size={22} />}
                     label={t.timeBlockDetail.wind}
-                    value={`${Math.round(block.windSpeed)} km/h`}
+                    value={`${Math.round(detail.windSpeed)} km/h`}
                   />
                 )}
-                {block.humidity !== undefined && (
+                {detail.humidity !== undefined && (
                   <Metric
                     icon={<Droplet size={22} />}
                     label={t.timeBlockDetail.humidity}
-                    value={`${Math.round(block.humidity)}%`}
+                    value={`${Math.round(detail.humidity)}%`}
                   />
                 )}
-                {block.uvIndex !== undefined && (
+                {detail.uvIndex !== undefined && (
                   <Metric
                     icon={<Sun size={22} />}
                     label={t.timeBlockDetail.uvIndex}
-                    value={`${Math.round(block.uvIndex)} · ${translateUvLevel(t, block.uvIndex)}`}
+                    value={`${Math.round(detail.uvIndex)} · ${translateUvLevel(t, detail.uvIndex)}`}
                   />
                 )}
               </div>
             </div>
 
             {/* Hourly forecast */}
-            {block.hours.length > 0 && (
+            {detail.hours.length > 0 && (
               <div className="flex flex-col gap-3">
                 <SectionHeading>{t.timeBlockDetail.hourlyForecast}</SectionHeading>
                 <div className="flex gap-3">
-                  {block.hours.map((hour) => (
+                  {detail.hours.map((hour) => (
                     <div
                       key={hour.isoTime}
                       className="flex flex-1 flex-col items-center gap-1.5 rounded-xl px-2 py-3"
@@ -263,11 +261,11 @@ export function TimeBlockDetailDialog({ block, onClose }: TimeBlockDetailDialogP
             )}
 
             {/* Recommended clothing */}
-            {block.clothingItems.length > 0 && (
+            {detail.clothingItems.length > 0 && (
               <div className="flex flex-col gap-3">
                 <SectionHeading>{t.timeBlockDetail.recommendedClothing}</SectionHeading>
                 <div className="flex flex-wrap gap-x-4 gap-y-4">
-                  {block.clothingItems.map((item, index) => {
+                  {detail.clothingItems.map((item, index) => {
                     const iconFilename = getClothingIcon(item.id);
                     const iconUrl = iconFilename ? getClothingIconUrl(iconFilename) : undefined;
                     const tint = protectionTint(item.category);

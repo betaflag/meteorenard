@@ -60,3 +60,16 @@ export interface DayForecastData {
   precipitationProbability?: number;
   clothingItems: ClothingItem[]; // Recommended for the day's low temperature
 }
+
+/**
+ * Hourly-derived extras for a day's detail view. Absent fields (and an empty
+ * `hours`) mean the day is beyond the hourly forecast window, leaving only the
+ * daily summary.
+ */
+export interface DayDetailExtra {
+  feelsLike?: number;
+  windSpeed?: number;
+  humidity?: number;
+  uvIndex?: number;
+  hours: HourlyWeather[];
+}

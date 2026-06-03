@@ -1,5 +1,5 @@
 import type { WeatherData, HourlyWeather, WeatherCondition } from '@/types/weather';
-import type { TimeBlockConfig, TimeBlockData, DayForecastData } from './types';
+import type { TimeBlockConfig, TimeBlockData, DayForecastData, DayDetailExtra } from './types';
 import { TimeBlockPeriod as Period } from './types';
 import { ClothingRecommendationService } from '../clothing/ClothingRecommendationService';
 import type { ClothingItem } from '../clothing/types';
@@ -396,5 +396,34 @@ export class TimeBlockService {
         clothingItems,
       };
     });
+  }
+
+  /**
+   * Hourly-derived extras for a forecast day's detail view (feels-like, wind,
+   * humidity, peak UV, and a sampled hourly strip). Returns empty extras when no
+   * hourly data covers that date — i.e. days beyond the ~48h hourly window.
+   *
+   * @param weatherData - Weather data from API
+   * @param date - The day's ISO date string (e.g. "2026-06-04")
+   */
+  static getDayDetail(weatherData: WeatherData | null, date: string): DayDetailExtra {
+    const start = new Date(date + 'T00:00:00');
+    const end = new Date(start);
+    end.setDate(start.getDate() + 1);
+
+    const avg = this.getAverageWeatherForRange(weatherData?.hourly ?? [], start, end);
+    if (!avg) {
+      return { hours: [] };
+    }
+
+    // Sample every 3 hours so a full day fits the dialog's hourly strip.
+    const hours = avg.hours.filter((_, i) => i % 3 === 0);
+    return {
+      feelsLike: avg.feelsLike,
+      windSpeed: avg.windSpeed,
+      humidity: avg.humidity,
+      uvIndex: avg.uvIndex,
+      hours,
+    };
   }
 }
