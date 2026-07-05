@@ -117,10 +117,17 @@ export function ClockPage() {
   const timezoneRef = useRef<string | undefined>(undefined);
   timezoneRef.current = weatherData?.timezone;
 
+  // Monotonic fetch counter: only the latest request may set state, so a slow
+  // response for a previous location can't overwrite the current one.
+  const fetchSeq = useRef(0);
+
   const fetchWeatherData = useCallback(async (location: Location) => {
+    const seq = ++fetchSeq.current;
     try {
       const data = await fetchWeather(location);
-      setWeatherData(data);
+      if (fetchSeq.current === seq) {
+        setWeatherData(data);
+      }
     } catch (err) {
       console.error('Weather fetch error:', err);
     }

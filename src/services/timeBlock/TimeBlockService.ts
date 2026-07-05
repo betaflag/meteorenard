@@ -234,13 +234,13 @@ export class TimeBlockService {
 
     let snowAccumulation: number | undefined;
     if (condition === 'snow') {
+      // Open-Meteo's snowfall is already snow depth in cm (not water
+      // equivalent), so the block total is a plain sum.
       const snowVals = relevantData
-        .map((h) => h.precipitation)
-        .filter((p): p is number => p !== undefined && p > 0);
+        .map((h) => h.snowfall)
+        .filter((s): s is number => s !== undefined && s > 0);
       if (snowVals.length > 0) {
-        // Sum precipitation (in mm) and convert to cm
-        const totalSnowMm = snowVals.reduce((sum, p) => sum + p, 0);
-        snowAccumulation = totalSnowMm / 10;
+        snowAccumulation = snowVals.reduce((sum, s) => sum + s, 0);
       }
     }
 
@@ -268,11 +268,19 @@ export class TimeBlockService {
     instance: TimeBlockInstance,
     weatherData: WeatherData | null
   ): { temp: number; condition: WeatherCondition; precipitationProbability?: number } {
-    const { config, isNextDay } = instance;
+    const { config, start } = instance;
 
     if (weatherData?.daily && weatherData.daily.length > 0) {
-      const dayIndex = isNextDay ? 1 : 0;
-      const dayData = weatherData.daily[Math.min(dayIndex, weatherData.daily.length - 1)];
+      // Match the block's calendar date against the daily entries. The daily
+      // forecast starts at tomorrow (the adapter drops today), so today's
+      // blocks find no exact match and fall back to the nearest entry.
+      const isoDate = [
+        start.getFullYear(),
+        String(start.getMonth() + 1).padStart(2, '0'),
+        String(start.getDate()).padStart(2, '0'),
+      ].join('-');
+      const dayData =
+        weatherData.daily.find((day) => day.date === isoDate) ?? weatherData.daily[0];
 
       let temperature: number;
       if (config.startHour >= 12 && config.startHour < 17) {

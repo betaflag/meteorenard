@@ -22,8 +22,15 @@ export class LocationStorageService {
       const stored = localStorage.getItem(STORAGE_KEYS.CURRENT_LOCATION);
       if (stored) {
         const location = JSON.parse(stored) as Location;
-        // Validate the location has required fields
-        if (location.name && location.latitude && location.longitude) {
+        // Validate the location has required fields. Coordinates are checked
+        // with Number.isFinite, not truthiness — 0 is a valid latitude or
+        // longitude (equator / prime meridian, reachable via the globe picker).
+        if (
+          typeof location.name === 'string' &&
+          location.name &&
+          Number.isFinite(location.latitude) &&
+          Number.isFinite(location.longitude)
+        ) {
           return location;
         }
       }

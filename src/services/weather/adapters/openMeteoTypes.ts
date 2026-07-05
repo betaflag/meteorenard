@@ -22,7 +22,7 @@ export interface OpenMeteoResponse {
     relativehumidity_2m: number[];
     windspeed_10m: number[];
     precipitation_probability: number[];
-    precipitation: number[];
+    snowfall: number[]; // snow depth in cm (not water equivalent)
     uv_index: number[];
   };
   daily: {

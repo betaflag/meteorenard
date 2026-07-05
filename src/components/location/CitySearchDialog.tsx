@@ -23,7 +23,7 @@ export function CitySearchDialog({
   onOpenChange,
   onCitySelected,
 }: CitySearchDialogProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<CitySearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -43,13 +43,13 @@ export function CitySearchDialog({
     setShowPopularCities(false);
     const timeoutId = setTimeout(async () => {
       setIsSearching(true);
-      const results = await GeocodingService.searchCities(searchQuery);
+      const results = await GeocodingService.searchCities(searchQuery, 10, language);
       setSearchResults(results);
       setIsSearching(false);
     }, 300);
 
     return () => clearTimeout(timeoutId);
-  }, [searchQuery]);
+  }, [searchQuery, language]);
 
   const handleCitySelect = useCallback(
     (location: Location) => {
@@ -72,7 +72,7 @@ export function CitySearchDialog({
 
   const handleAutoDetect = async () => {
     setIsDetectingLocation(true);
-    const result = await GeolocationService.getCurrentPosition();
+    const result = await GeolocationService.getCurrentPosition(language);
     setIsDetectingLocation(false);
 
     if (result.location) {

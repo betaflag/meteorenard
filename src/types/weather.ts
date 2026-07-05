@@ -17,7 +17,7 @@ export interface HourlyWeather {
   humidity?: number;
   windSpeed?: number;
   precipitationProbability?: number;
-  precipitation?: number; // in mm
+  snowfall?: number; // snow depth in cm
   uvIndex?: number;
 }
 

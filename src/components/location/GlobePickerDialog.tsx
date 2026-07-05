@@ -38,7 +38,7 @@ export function GlobePickerDialog({
   onOpenChange,
   onLocationSelected,
 }: GlobePickerDialogProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [countries, setCountries] = useState<object[] | null>(countriesCache);
   const [loadFailed, setLoadFailed] = useState(false);
   const [pick, setPick] = useState<GlobePick | null>(null);
@@ -70,17 +70,20 @@ export function GlobePickerDialog({
 
   // Stable identity so the memoized PlanetGlobe doesn't re-render when geocoding
   // state changes — the pin drops on tap, and resolving happens off to the side.
-  const handlePick = useCallback((next: GlobePick) => {
-    const token = ++pickToken.current;
-    setPick(next);
-    setLocation(null);
-    setIsResolving(true);
-    resolveLocationFromCoords(next.lat, next.lng).then((resolved) => {
-      if (pickToken.current !== token) return;
-      setLocation(resolved);
-      setIsResolving(false);
-    });
-  }, []);
+  const handlePick = useCallback(
+    (next: GlobePick) => {
+      const token = ++pickToken.current;
+      setPick(next);
+      setLocation(null);
+      setIsResolving(true);
+      resolveLocationFromCoords(next.lat, next.lng, language).then((resolved) => {
+        if (pickToken.current !== token) return;
+        setLocation(resolved);
+        setIsResolving(false);
+      });
+    },
+    [language]
+  );
 
   const handleConfirm = () => {
     if (!location) return;
@@ -116,19 +119,33 @@ export function GlobePickerDialog({
 
         {/* Selected place + actions */}
         <div className="flex items-center justify-between gap-4 flex-shrink-0">
-          <div className="flex items-center gap-2 min-w-0">
-            <MapPin className="w-4 h-4 text-[#C5A572] flex-shrink-0" />
-            <span className="truncate text-[#e5e7eb]">
-              {isResolving ? (
-                <span className="inline-flex items-center gap-2 text-[#a8a8a8]">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  {t.globePicker.resolving}
-                </span>
-              ) : location ? (
-                <span className="font-semibold">{location.name}</span>
-              ) : (
-                <span className="text-[#a8a8a8]">{t.globePicker.noSelection}</span>
-              )}
+          <div className="flex flex-col gap-0.5 min-w-0">
+            <div className="flex items-center gap-2 min-w-0">
+              <MapPin className="w-4 h-4 text-[#C5A572] flex-shrink-0" />
+              <span className="truncate text-[#e5e7eb]">
+                {isResolving ? (
+                  <span className="inline-flex items-center gap-2 text-[#a8a8a8]">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    {t.globePicker.resolving}
+                  </span>
+                ) : location ? (
+                  <span className="font-semibold">{location.name}</span>
+                ) : (
+                  <span className="text-[#a8a8a8]">{t.globePicker.noSelection}</span>
+                )}
+              </span>
+            </div>
+            {/* Attribution required by the Nominatim / OSM usage policy */}
+            <span className="text-xs text-[#6b7280]">
+              {t.globePicker.attribution}{' '}
+              <a
+                href="https://www.openstreetmap.org/copyright"
+                target="_blank"
+                rel="noreferrer"
+                className="underline hover:text-[#a8a8a8]"
+              >
+                © OpenStreetMap
+              </a>
             </span>
           </div>
 

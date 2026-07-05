@@ -33,6 +33,7 @@ const en: Translations = {
     loadError: 'Could not load the globe. Please try again.',
     confirm: 'See the weather here',
     cancel: 'Cancel',
+    attribution: 'Place names',
   },
 
   forecastToggle: {
@@ -188,6 +189,7 @@ const fr: Translations = {
     loadError: 'Impossible de charger le globe. Réessaie.',
     confirm: 'Voir la météo ici',
     cancel: 'Annuler',
+    attribution: 'Noms de lieux',
   },
 
   forecastToggle: {

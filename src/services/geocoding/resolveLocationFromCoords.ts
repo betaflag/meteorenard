@@ -19,9 +19,10 @@ function formatCoordinates(latitude: number, longitude: number): string {
  */
 export async function resolveLocationFromCoords(
   latitude: number,
-  longitude: number
+  longitude: number,
+  language: string = 'fr'
 ): Promise<Location> {
-  const resolved = await ReverseGeocodingService.reverseGeocode(latitude, longitude);
+  const resolved = await ReverseGeocodingService.reverseGeocode(latitude, longitude, language);
   if (resolved) {
     return resolved;
   }

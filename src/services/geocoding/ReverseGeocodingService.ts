@@ -28,11 +28,13 @@ export class ReverseGeocodingService {
    * Get location name from coordinates using OpenStreetMap Nominatim API
    * @param latitude - Latitude coordinate
    * @param longitude - Longitude coordinate
+   * @param language - Language code for place names (default: 'fr')
    * @returns Location with name, or null if geocoding fails
    */
   static async reverseGeocode(
     latitude: number,
-    longitude: number
+    longitude: number,
+    language: string = 'fr'
   ): Promise<Location | null> {
     try {
       // Respect rate limiting (max 1 request per second)
@@ -42,14 +44,12 @@ export class ReverseGeocodingService {
       url.searchParams.set('lat', latitude.toString());
       url.searchParams.set('lon', longitude.toString());
       url.searchParams.set('format', 'json');
-      url.searchParams.set('accept-language', 'fr'); // French names
+      url.searchParams.set('accept-language', language);
       url.searchParams.set('zoom', '10'); // City-level detail
 
-      const response = await fetch(url.toString(), {
-        headers: {
-          'User-Agent': 'MeteoRenard/1.0', // Required by Nominatim
-        },
-      });
+      // No custom User-Agent: browsers ignore it as a forbidden header. For
+      // browser apps the Nominatim usage policy identifies us via the Referer.
+      const response = await fetch(url.toString());
 
       if (!response.ok) {
         console.error('Reverse geocoding failed:', response.statusText);

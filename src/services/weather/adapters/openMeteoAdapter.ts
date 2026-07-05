@@ -91,7 +91,14 @@ export function adaptOpenMeteoResponse(
   //
   // "now" is the location's wall clock (the hourly times are naive local), so
   // the future filter is correct even when the device is in another timezone.
+  //
+  // Filter from the top of the current hour, not the exact minute, so the
+  // in-progress hour is kept: hourly[0] describes "right now" (feels-like, UV)
+  // and the timeline curve starts at the "now" marker instead of up to an hour
+  // after it.
   const now = getZonedNow(response.timezone);
+  const topOfHour = new Date(now);
+  topOfHour.setMinutes(0, 0, 0);
   const hourlyDataFull = response.hourly.time
     .map((time, index) => ({
       time,
@@ -101,10 +108,10 @@ export function adaptOpenMeteoResponse(
       humidity: response.hourly.relativehumidity_2m[index],
       windSpeed: Math.round(response.hourly.windspeed_10m[index]),
       precipitationProbability: response.hourly.precipitation_probability[index],
-      precipitation: response.hourly.precipitation[index],
+      snowfall: response.hourly.snowfall[index],
       uvIndex: response.hourly.uv_index[index],
     }))
-    .filter((hour) => new Date(hour.time) >= now);
+    .filter((hour) => new Date(hour.time) >= topOfHour);
 
   const hourlyData = hourlyDataFull.slice(0, 48).map((hour) => ({
     time: formatTime(hour.time),
@@ -115,7 +122,7 @@ export function adaptOpenMeteoResponse(
     humidity: hour.humidity,
     windSpeed: hour.windSpeed,
     precipitationProbability: hour.precipitationProbability,
-    precipitation: hour.precipitation,
+    snowfall: hour.snowfall,
     uvIndex: hour.uvIndex,
   }));
 
@@ -135,8 +142,8 @@ export function adaptOpenMeteoResponse(
     current: {
       location: locationName,
       temp: currentTemp,
-      // current_weather has no apparent temperature; the nearest hour is the
-      // closest available "feels like" for right now.
+      // current_weather has no apparent temperature; the in-progress hour is
+      // the closest available "feels like" for right now.
       feelsLike: hourlyData[0]?.feelsLike,
       condition: mapWeatherCode(currentWeatherCode),
       description: getWeatherDescription(currentWeatherCode),

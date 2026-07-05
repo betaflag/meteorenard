@@ -25,10 +25,12 @@ export class GeolocationService {
 
   /**
    * Get the user's current position
+   * @param language - Language code for the reverse-geocoded place name
    * @param timeout - Timeout in milliseconds (default: 10000)
    * @returns Promise resolving to GeolocationResult
    */
   static async getCurrentPosition(
+    language: string = 'fr',
     timeout: number = this.DEFAULT_TIMEOUT
   ): Promise<GeolocationResult> {
     // Check if geolocation is supported
@@ -58,7 +60,8 @@ export class GeolocationService {
           // Try to get city name via reverse geocoding
           const geocodedLocation = await ReverseGeocodingService.reverseGeocode(
             latitude,
-            longitude
+            longitude,
+            language
           );
 
           resolve({

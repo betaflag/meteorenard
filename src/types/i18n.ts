@@ -36,6 +36,7 @@ export interface Translations {
     loadError: string;
     confirm: string;
     cancel: string;
+    attribution: string;
   };
 
   // Swap button toggling the tiles between today's time blocks and a 3-day outlook

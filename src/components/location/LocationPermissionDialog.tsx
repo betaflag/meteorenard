@@ -24,7 +24,7 @@ export function LocationPermissionDialog({
   onLocationSelected,
   onManualSelection,
 }: LocationPermissionDialogProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,7 +32,7 @@ export function LocationPermissionDialog({
     setIsLoading(true);
     setError(null);
 
-    const result = await GeolocationService.getCurrentPosition();
+    const result = await GeolocationService.getCurrentPosition(language);
 
     if (result.location) {
       onLocationSelected(result.location);
