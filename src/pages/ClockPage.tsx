@@ -213,7 +213,7 @@ export function ClockPage() {
   };
 
   return (
-    <div className="fixed inset-0 overflow-hidden flex flex-col" style={{ background: '#0e111c' }}>
+    <div className="relative h-full w-full overflow-hidden flex flex-col" style={{ background: '#0e111c' }}>
       {/* Photo scene region — everything except the solid bottom timeline bar */}
       <div
         className="relative flex-1 overflow-hidden cursor-pointer"

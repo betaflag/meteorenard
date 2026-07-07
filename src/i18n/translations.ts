@@ -40,6 +40,14 @@ const en: Translations = {
     today: 'Today',
   },
 
+  radar: {
+    title: 'Radar',
+    precipitation: 'Precipitation',
+    clouds: 'Clouds',
+    loading: 'Loading radar...',
+    loadError: 'Radar unavailable right now',
+  },
+
   timeBlocks: {
     morning: 'Morning (8am-12pm)',
     afternoon: 'Afternoon (12pm-5pm)',
@@ -193,6 +201,14 @@ const fr: Translations = {
   forecastToggle: {
     threeDay: '3 jours',
     today: 'Aujourd\'hui',
+  },
+
+  radar: {
+    title: 'Radar',
+    precipitation: 'Précipitations',
+    clouds: 'Nuages',
+    loading: 'Chargement du radar...',
+    loadError: 'Radar indisponible pour le moment',
   },
 
   timeBlocks: {

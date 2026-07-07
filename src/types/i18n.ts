@@ -44,6 +44,15 @@ export interface Translations {
     today: string;
   };
 
+  // Swipeable radar page (precipitation + cloud cover)
+  radar: {
+    title: string;
+    precipitation: string;
+    clouds: string;
+    loading: string;
+    loadError: string;
+  };
+
   // Time Blocks
   timeBlocks: {
     morning: string;
